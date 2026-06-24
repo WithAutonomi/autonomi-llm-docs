@@ -6,6 +6,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-worker-preview
+  cancel-in-progress: false
+
 jobs:
   deploy-preview:
     name: Deploy preview Worker

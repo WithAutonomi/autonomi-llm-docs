@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { parse } from "jsonc-parser";
 
 const mode = process.argv[2];
 
@@ -10,7 +11,13 @@ if (mode !== "preview" && mode !== "production") {
 const configPath =
   mode === "preview" ? "wrangler.preview.jsonc" : "wrangler.jsonc";
 const configText = fs.readFileSync(configPath, "utf8");
-const config = JSON.parse(configText.replace(/,\s*([}\]])/g, "$1"));
+const parseErrors = [];
+const config = parse(configText, parseErrors, { allowTrailingComma: true });
+
+if (parseErrors.length > 0) {
+  console.error(`${configPath}: invalid JSONC`);
+  process.exit(1);
+}
 
 function assert(condition, message) {
   if (!condition) {

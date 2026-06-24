@@ -11,7 +11,7 @@ This directory contains source-controlled Cloudflare Worker code and deployment 
 - `workers_dev`: disabled for production
 - Connected bindings: none
 - Observability: logs enabled with 100% sampling; traces disabled in the confirmed production inventory
-- Behaviour: serve `.md`, `/llms.txt`, and `/llms-full.txt` from `maidsafe/autonomi-llm-docs` on GitHub, falling back to Framer for misses and all other paths
+- Behaviour: serve public `.md`, `/llms.txt`, and `/llms-full.txt` paths from `maidsafe/autonomi-llm-docs` on GitHub, excluding internal prefixes `/worker/` and `/.github/`, and falling back to Framer for misses and all other paths
 
 ## Local setup
 
@@ -23,7 +23,17 @@ npm ci
 npm run check
 ```
 
-`npm run check` performs formatting, JavaScript syntax, and Wrangler dry-run validation for both preview and production configs. It does not deploy.
+`npm run check` performs formatting, JavaScript syntax, runtime tests, config assertions, and Wrangler dry-run validation for both preview and production configs. It does not deploy.
+
+## Serving policy
+
+The public serving policy follows ADR-0006:
+
+- `.md` files outside internal prefixes are served from GitHub raw content.
+- `/llms.txt` and `/llms-full.txt` are served from GitHub raw content.
+- `/worker/` and `/.github/` are internal prefixes and fall through to Framer rather than being served from GitHub raw content.
+
+Keep operational documentation under internal prefixes or use a non-served extension. This runbook uses `.markdown` so it cannot be exposed by older deployed Worker versions that predate the `/worker/` exclusion rule.
 
 ## GitHub secrets
 
@@ -72,6 +82,7 @@ After a preview deploy, use the workers.dev URL printed by Wrangler:
 curl -i "$PREVIEW_URL/llms.txt"
 curl -i "$PREVIEW_URL/llms-full.txt"
 curl -i "$PREVIEW_URL/overview.md"
+curl -i "$PREVIEW_URL/worker/README.md"
 curl -i "$PREVIEW_URL/"
 ```
 
@@ -81,6 +92,7 @@ After a production deploy or rollback:
 curl -i https://autonomi.com/llms.txt
 curl -i https://autonomi.com/llms-full.txt
 curl -i https://autonomi.com/overview.md
+curl -i https://autonomi.com/worker/README.md
 curl -i https://autonomi.com/
 ```
 
@@ -88,6 +100,7 @@ Expected results:
 
 - `/llms.txt` and `/llms-full.txt` return `Content-Type: text/plain; charset=utf-8` and `Cache-Control: public, max-age=300` when present in GitHub.
 - `.md` paths return `Content-Type: text/markdown; charset=utf-8` and `Cache-Control: public, max-age=300` when present in GitHub.
+- Internal-prefix paths such as `/worker/README.md` fall through to Framer rather than serving GitHub raw content.
 - Missing markdown/LLM paths and non-matching paths fall through to Framer unchanged.
 
 ## Rollback

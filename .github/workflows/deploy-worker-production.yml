@@ -6,6 +6,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-worker-production
+  cancel-in-progress: false
+
 jobs:
   deploy-production:
     name: Deploy production Worker

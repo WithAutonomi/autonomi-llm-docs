@@ -9,7 +9,7 @@ This repository contains:
 - **llms.txt** - Main index file following the [llms.txt standard](https://llmstxt.org/)
 - **Markdown documentation** - Clean, comprehensive content about Autonomi's architecture, features, and developer experience
 - **Page variants** - `.md` versions of key autonomi.com pages for AI consumption
-- **Cloudflare Worker config** - Source-controlled Worker code and manual deployment workflows in [`worker/`](worker/README.md)
+- **Cloudflare Worker config** - Source-controlled Worker code and manual deployment workflows in [`worker/`](worker/README.markdown)
 
 ## How It Works
 
@@ -20,6 +20,23 @@ Files appear to live on autonomi.com but are actually served from this GitHub re
 - Easy collaborative editing
 - Single source of truth
 - Clean content without HTML wrappers
+
+## Public Serving Policy
+
+The Cloudflare Worker serves `.md`, `/llms.txt`, and `/llms-full.txt` from this repo at canonical `autonomi.com` URLs, except for internal repository prefixes.
+
+Public by default:
+
+- `.md` files outside internal prefixes
+- `/llms.txt`
+- `/llms-full.txt`
+
+Internal prefixes not served from GitHub raw content:
+
+- `/worker/`
+- `/.github/`
+
+To publish machine-readable content, add a `.md` file outside the internal prefixes. To keep operational or repository-internal documentation out of canonical `autonomi.com` serving, place it under an internal prefix or use a non-served extension. See ADR-0006 for the decision record.
 
 ## Who This Is For
 

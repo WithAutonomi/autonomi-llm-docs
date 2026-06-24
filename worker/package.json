@@ -7,15 +7,17 @@
     "format": "prettier --write . \"../.github/workflows/*.yml\"",
     "format:check": "prettier --check . \"../.github/workflows/*.yml\"",
     "check:syntax": "node --check src/index.js",
+    "test": "node --test",
     "assert:preview": "node scripts/assert-config.mjs preview",
     "assert:production": "node scripts/assert-config.mjs production",
     "check:preview": "wrangler deploy --dry-run --config wrangler.preview.jsonc",
     "check:production": "wrangler deploy --dry-run --config wrangler.jsonc",
-    "check": "npm run format:check && npm run check:syntax && npm run assert:preview && npm run assert:production && npm run check:preview && npm run check:production",
+    "check": "npm run format:check && npm run check:syntax && npm test && npm run assert:preview && npm run assert:production && npm run check:preview && npm run check:production",
     "deploy:preview": "npm run assert:preview && wrangler deploy --config wrangler.preview.jsonc",
     "deploy:production": "npm run assert:production && wrangler deploy --config wrangler.jsonc"
   },
   "devDependencies": {
+    "jsonc-parser": "3.3.1",
     "prettier": "3.8.4",
     "wrangler": "4.104.0"
   }
