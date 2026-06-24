@@ -32,6 +32,16 @@ function fallbackResponse(url) {
   });
 }
 
+function encodeRepeatedly(value, times) {
+  let encoded = value;
+
+  for (let index = 0; index < times; index += 1) {
+    encoded = encodeURIComponent(encoded);
+  }
+
+  return encoded;
+}
+
 test("proxies public markdown paths from GitHub", async () => {
   const { calls, response } = await withFetchMock((url) => {
     assert.equal(url, `${GITHUB_PREFIX}/overview.md`);
@@ -106,13 +116,23 @@ test("falls through for GitHub workflow markdown paths", async () => {
 test("falls through for encoded internal-prefix bypass attempts", async (t) => {
   const cases = [
     ["encoded worker slash", "/worker%2FREADME.md"],
+    ["encoded worker backslash", "/worker%5CREADME.md"],
     ["encoded worker letters", "/%77orker/README.md"],
     ["encoded .github dot", "/%2Egithub/PULL_REQUEST_TEMPLATE.md"],
+    ["encoded .github backslash", "/.github%5CPULL_REQUEST_TEMPLATE.md"],
     ["encoded .github letters", "/.%67ithub/PULL_REQUEST_TEMPLATE.md"],
     ["encoded dot segment to worker", "/public%2F..%2Fworker%2FREADME.md"],
     [
+      "encoded backslash dot segment to worker",
+      "/public%5C..%5Cworker%5CREADME.md",
+    ],
+    [
       "encoded dot segment to .github",
       "/public%2F..%2F.github%2FPULL_REQUEST_TEMPLATE.md",
+    ],
+    [
+      "encoded backslash dot segment to .github",
+      "/public%5C..%5C.github%5CPULL_REQUEST_TEMPLATE.md",
     ],
   ];
 
@@ -176,6 +196,27 @@ test("falls through for repeatedly encoded internal-prefix bypass attempts", asy
       );
     });
   }
+});
+
+test("falls through for over-budget repeated percent encoding", async () => {
+  const repeatedEncodedLetter = encodeRepeatedly("%70", 16);
+  const pathname = `/${repeatedEncodedLetter}ublic.md`;
+  const requestUrl = new URL(`https://autonomi.com${pathname}`).href;
+  const { calls, response } = await withFetchMock((url) => {
+    assert.ok(
+      !url.startsWith(GITHUB_PREFIX),
+      `over-budget encoded path fetched GitHub raw: ${url}`,
+    );
+
+    return fallbackResponse(url);
+  }, pathname);
+
+  assert.deepEqual(calls, [requestUrl]);
+  assert.equal(response.status, 203);
+  assert.equal(
+    await response.text(),
+    `fallback:${new URL(requestUrl).pathname}`,
+  );
 });
 
 test("falls through when GitHub returns a miss", async () => {

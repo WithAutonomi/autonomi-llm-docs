@@ -1,4 +1,6 @@
 const INTERNAL_PREFIXES = ["/worker/", "/.github/"];
+const MAX_POLICY_DECODE_PASSES = 16;
+const HAS_PERCENT_ENCODED_BYTE = /%[0-9a-fA-F]{2}/;
 const PERCENT_ENCODED_BYTE = /%([0-9a-fA-F]{2})/g;
 
 function decodePercentEncodedBytes(pathname) {
@@ -29,30 +31,38 @@ function normalizePathname(pathname) {
     : normalized;
 }
 
-function policyPathVariants(pathname) {
-  const variants = new Set();
-  let current = pathname;
-
-  while (true) {
-    variants.add(current);
-    variants.add(normalizePathname(current));
-
-    const decoded = decodePercentEncodedBytes(current);
-    if (decoded === current) {
-      return variants;
-    }
-
-    // Each percent-byte decode replaces a three-character `%XX` escape with
-    // one character, so repeated decoding strictly shortens the pathname until
-    // there are no encoded bytes left.
-    current = decoded;
-  }
+function hasInternalPrefix(pathname) {
+  return INTERNAL_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
-function isInternalPath(pathname) {
-  return Array.from(policyPathVariants(pathname)).some((variant) =>
-    INTERNAL_PREFIXES.some((prefix) => variant.startsWith(prefix)),
+function isInternalCandidate(pathname) {
+  return (
+    hasInternalPrefix(pathname) ||
+    hasInternalPrefix(normalizePathname(pathname))
   );
+}
+
+function isInternalOrUnsafePath(pathname) {
+  let current = pathname;
+
+  if (isInternalCandidate(current)) {
+    return true;
+  }
+
+  for (let pass = 0; pass < MAX_POLICY_DECODE_PASSES; pass += 1) {
+    if (!HAS_PERCENT_ENCODED_BYTE.test(current)) {
+      return false;
+    }
+
+    current = decodePercentEncodedBytes(current);
+
+    if (isInternalCandidate(current)) {
+      return true;
+    }
+  }
+
+  // Fail closed rather than spending unbounded CPU decoding adversarial paths.
+  return HAS_PERCENT_ENCODED_BYTE.test(current);
 }
 
 function shouldProxy(pathname) {
@@ -61,7 +71,7 @@ function shouldProxy(pathname) {
     pathname === "/llms.txt" ||
     pathname === "/llms-full.txt";
 
-  return publicDocsPath && !isInternalPath(pathname);
+  return publicDocsPath && !isInternalOrUnsafePath(pathname);
 }
 
 function contentTypeFor(pathname) {
