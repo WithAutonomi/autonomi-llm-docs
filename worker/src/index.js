@@ -1,6 +1,5 @@
 const INTERNAL_PREFIXES = ["/worker/", "/.github/"];
 const PERCENT_ENCODED_BYTE = /%([0-9a-fA-F]{2})/g;
-const MAX_POLICY_DECODE_PASSES = 5;
 
 function decodePercentEncodedBytes(pathname) {
   return pathname.replace(PERCENT_ENCODED_BYTE, (_, hex) =>
@@ -34,22 +33,20 @@ function policyPathVariants(pathname) {
   const variants = new Set();
   let current = pathname;
 
-  for (let pass = 0; pass < MAX_POLICY_DECODE_PASSES; pass += 1) {
+  while (true) {
     variants.add(current);
     variants.add(normalizePathname(current));
 
     const decoded = decodePercentEncodedBytes(current);
     if (decoded === current) {
-      break;
+      return variants;
     }
 
+    // Each percent-byte decode replaces a three-character `%XX` escape with
+    // one character, so repeated decoding strictly shortens the pathname until
+    // there are no encoded bytes left.
     current = decoded;
   }
-
-  variants.add(current);
-  variants.add(normalizePathname(current));
-
-  return variants;
 }
 
 function isInternalPath(pathname) {

@@ -138,6 +138,46 @@ test("falls through for encoded internal-prefix bypass attempts", async (t) => {
   }
 });
 
+test("falls through for repeatedly encoded internal-prefix bypass attempts", async (t) => {
+  const cases = [
+    ["deeply encoded worker letters", "/%252525252577orker/README.md"],
+    [
+      "deeply encoded .github dot",
+      "/%25252525252Egithub/PULL_REQUEST_TEMPLATE.md",
+    ],
+    ["deeply encoded worker slash", "/worker%25252525252FREADME.md"],
+    [
+      "deeply encoded dot segment to worker",
+      "/public%25252525252F..%25252525252Fworker%25252525252FREADME.md",
+    ],
+    [
+      "deeply encoded dot segment to .github",
+      "/public%25252525252F..%25252525252F.github%25252525252FPULL_REQUEST_TEMPLATE.md",
+    ],
+  ];
+
+  for (const [name, pathname] of cases) {
+    await t.test(name, async () => {
+      const requestUrl = new URL(`https://autonomi.com${pathname}`).href;
+      const { calls, response } = await withFetchMock((url) => {
+        assert.ok(
+          !url.startsWith(GITHUB_PREFIX),
+          `deeply encoded internal path fetched GitHub raw: ${url}`,
+        );
+
+        return fallbackResponse(url);
+      }, pathname);
+
+      assert.deepEqual(calls, [requestUrl]);
+      assert.equal(response.status, 203);
+      assert.equal(
+        await response.text(),
+        `fallback:${new URL(requestUrl).pathname}`,
+      );
+    });
+  }
+});
+
 test("falls through when GitHub returns a miss", async () => {
   const { calls, response } = await withFetchMock((url) => {
     if (url === `${GITHUB_PREFIX}/missing.md`) {
