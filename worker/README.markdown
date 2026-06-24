@@ -48,7 +48,7 @@ Because this token can update production Cloudflare resources, both deploy workf
 
 ## Preview deploy
 
-Preview deploys are manual only. They use the GitHub `production` environment approval gate because they use the same Cloudflare account credentials as production deploys.
+Preview deploys are manual only and run only from the `main` branch. They use the GitHub `production` environment approval gate because they use the same Cloudflare account credentials as production deploys.
 
 From GitHub Actions, run **Deploy Worker Preview**. Locally, with Cloudflare credentials exported:
 
