@@ -1,4 +1,62 @@
 const INTERNAL_PREFIXES = ["/worker/", "/.github/"];
+const PERCENT_ENCODED_BYTE = /%([0-9a-fA-F]{2})/g;
+const MAX_POLICY_DECODE_PASSES = 5;
+
+function decodePercentEncodedBytes(pathname) {
+  return pathname.replace(PERCENT_ENCODED_BYTE, (_, hex) =>
+    String.fromCharCode(Number.parseInt(hex, 16)),
+  );
+}
+
+function normalizePathname(pathname) {
+  const segments = [];
+
+  for (const segment of pathname.replaceAll("\\", "/").split("/")) {
+    if (segment === "" || segment === ".") {
+      continue;
+    }
+
+    if (segment === "..") {
+      segments.pop();
+      continue;
+    }
+
+    segments.push(segment);
+  }
+
+  const normalized = `/${segments.join("/")}`;
+  return pathname.endsWith("/") && normalized !== "/"
+    ? `${normalized}/`
+    : normalized;
+}
+
+function policyPathVariants(pathname) {
+  const variants = new Set();
+  let current = pathname;
+
+  for (let pass = 0; pass < MAX_POLICY_DECODE_PASSES; pass += 1) {
+    variants.add(current);
+    variants.add(normalizePathname(current));
+
+    const decoded = decodePercentEncodedBytes(current);
+    if (decoded === current) {
+      break;
+    }
+
+    current = decoded;
+  }
+
+  variants.add(current);
+  variants.add(normalizePathname(current));
+
+  return variants;
+}
+
+function isInternalPath(pathname) {
+  return Array.from(policyPathVariants(pathname)).some((variant) =>
+    INTERNAL_PREFIXES.some((prefix) => variant.startsWith(prefix)),
+  );
+}
 
 function shouldProxy(pathname) {
   const publicDocsPath =
@@ -6,11 +64,7 @@ function shouldProxy(pathname) {
     pathname === "/llms.txt" ||
     pathname === "/llms-full.txt";
 
-  const internalPath = INTERNAL_PREFIXES.some((prefix) =>
-    pathname.startsWith(prefix),
-  );
-
-  return publicDocsPath && !internalPath;
+  return publicDocsPath && !isInternalPath(pathname);
 }
 
 function contentTypeFor(pathname) {
@@ -23,7 +77,7 @@ export default {
   async fetch(request) {
     const url = new URL(request.url);
 
-    // Intercept public .md files AND llms.txt
+    // Intercept public .md files, llms.txt, and llms-full.txt.
     if (shouldProxy(url.pathname)) {
       // Try to fetch from GitHub
       const githubUrl = `https://raw.githubusercontent.com/maidsafe/autonomi-llm-docs/main${url.pathname}`;
@@ -54,5 +108,3 @@ export default {
     return fetch(request);
   },
 };
-
-export { INTERNAL_PREFIXES, shouldProxy };

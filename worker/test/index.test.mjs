@@ -103,6 +103,41 @@ test("falls through for GitHub workflow markdown paths", async () => {
   );
 });
 
+test("falls through for encoded internal-prefix bypass attempts", async (t) => {
+  const cases = [
+    ["encoded worker slash", "/worker%2FREADME.md"],
+    ["encoded worker letters", "/%77orker/README.md"],
+    ["encoded .github dot", "/%2Egithub/PULL_REQUEST_TEMPLATE.md"],
+    ["encoded .github letters", "/.%67ithub/PULL_REQUEST_TEMPLATE.md"],
+    ["encoded dot segment to worker", "/public%2F..%2Fworker%2FREADME.md"],
+    [
+      "encoded dot segment to .github",
+      "/public%2F..%2F.github%2FPULL_REQUEST_TEMPLATE.md",
+    ],
+  ];
+
+  for (const [name, pathname] of cases) {
+    await t.test(name, async () => {
+      const requestUrl = new URL(`https://autonomi.com${pathname}`).href;
+      const { calls, response } = await withFetchMock((url) => {
+        assert.ok(
+          !url.startsWith(GITHUB_PREFIX),
+          `encoded internal path fetched GitHub raw: ${url}`,
+        );
+
+        return fallbackResponse(url);
+      }, pathname);
+
+      assert.deepEqual(calls, [requestUrl]);
+      assert.equal(response.status, 203);
+      assert.equal(
+        await response.text(),
+        `fallback:${new URL(requestUrl).pathname}`,
+      );
+    });
+  }
+});
+
 test("falls through when GitHub returns a miss", async () => {
   const { calls, response } = await withFetchMock((url) => {
     if (url === `${GITHUB_PREFIX}/missing.md`) {

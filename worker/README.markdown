@@ -44,7 +44,7 @@ Manual deploy workflows require these repository, organization, or `production` 
 
 The Cloudflare API token should be scoped only as broadly as needed for this Worker, including Workers script edit access and route access for the `autonomi.com` zone.
 
-Because this token can update production Cloudflare resources, both deploy workflows use the GitHub `production` environment approval gate before they can access the token.
+Because this token can update production Cloudflare resources, both deploy workflows use the GitHub `production` environment approval gate before they can access the token. The workflow files reference that environment, but the environment's required reviewers, admin bypass, and self-review settings are GitHub repository settings outside this source tree. Operators must confirm those settings before the first deploy.
 
 ## Preview deploy
 
@@ -63,7 +63,7 @@ This uses `wrangler.preview.jsonc`, deploys Worker name `autonomi-md-proxy-previ
 
 Production deploys are manual only and run only from the `main` branch. Merging a PR must not deploy production.
 
-From GitHub Actions, run **Deploy Worker Production**. The job uses the GitHub `production` environment, so configure required reviewers/protection there before use. Locally, with Cloudflare credentials exported:
+From GitHub Actions, run **Deploy Worker Production**. The job uses the GitHub `production` environment, so configure and confirm required reviewers/protection there before use. Locally, with Cloudflare credentials exported:
 
 ```sh
 cd worker
@@ -86,7 +86,9 @@ curl -i "$PREVIEW_URL/worker/README.md"
 curl -i "$PREVIEW_URL/"
 ```
 
-After a production deploy or rollback:
+Preview smoke tests validate GitHub proxy paths and non-GitHub-serving behaviour: public documentation paths should be served from GitHub when present, while internal-prefix paths, missing Markdown/LLM paths, and non-matching paths should not return GitHub raw content. The preview Worker is not attached to the production `autonomi.com/*` route, so its workers.dev URL cannot validate that fallthrough reaches Framer.
+
+After a production deploy or rollback, use the routed `autonomi.com` URLs to validate both GitHub proxy paths and Framer fallthrough:
 
 ```sh
 curl -i https://autonomi.com/llms.txt
@@ -96,7 +98,7 @@ curl -i https://autonomi.com/worker/README.md
 curl -i https://autonomi.com/
 ```
 
-Expected results:
+Expected production/route results:
 
 - `/llms.txt` and `/llms-full.txt` return `Content-Type: text/plain; charset=utf-8` and `Cache-Control: public, max-age=300` when present in GitHub.
 - `.md` paths return `Content-Type: text/markdown; charset=utf-8` and `Cache-Control: public, max-age=300` when present in GitHub.
