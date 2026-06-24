@@ -1,6 +1,6 @@
 # ADR-0006: Define public serving scope for Markdown paths
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-06-24
 - **Decision owners:** Jim Collinson
 - **Reviewers:** Jim Collinson

@@ -1,6 +1,6 @@
 # ADR-0005: Manage autonomi-md-proxy through this repository
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-06-24
 - **Decision owners:** Jim Collinson
 - **Reviewers:** Jim Collinson
