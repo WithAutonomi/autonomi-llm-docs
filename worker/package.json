@@ -1,0 +1,20 @@
+{
+  "name": "autonomi-md-proxy-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write . \"../.github/workflows/*.yml\"",
+    "format:check": "prettier --check . \"../.github/workflows/*.yml\"",
+    "check:syntax": "node --check src/index.js",
+    "check:preview": "wrangler deploy --dry-run --config wrangler.preview.jsonc",
+    "check:production": "wrangler deploy --dry-run --config wrangler.jsonc",
+    "check": "npm run format:check && npm run check:syntax && npm run check:preview && npm run check:production",
+    "deploy:preview": "wrangler deploy --config wrangler.preview.jsonc",
+    "deploy:production": "wrangler deploy --config wrangler.jsonc"
+  },
+  "devDependencies": {
+    "prettier": "3.8.4",
+    "wrangler": "4.104.0"
+  }
+}
