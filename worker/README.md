@@ -27,16 +27,18 @@ npm run check
 
 ## GitHub secrets
 
-Manual deploy workflows require these repository or organization secrets:
+Manual deploy workflows require these repository, organization, or `production` environment secrets:
 
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
 
 The Cloudflare API token should be scoped only as broadly as needed for this Worker, including Workers script edit access and route access for the `autonomi.com` zone.
 
+Because this token can update production Cloudflare resources, both deploy workflows use the GitHub `production` environment approval gate before they can access the token.
+
 ## Preview deploy
 
-Preview deploys are manual only and do not use the production GitHub environment approval gate.
+Preview deploys are manual only. They use the GitHub `production` environment approval gate because they use the same Cloudflare account credentials as production deploys.
 
 From GitHub Actions, run **Deploy Worker Preview**. Locally, with Cloudflare credentials exported:
 
@@ -45,11 +47,11 @@ cd worker
 npm run deploy:preview
 ```
 
-This uses `wrangler.preview.jsonc`, deploys Worker name `autonomi-md-proxy-preview`, enables `workers_dev`, and does not attach a production route.
+This uses `wrangler.preview.jsonc`, deploys Worker name `autonomi-md-proxy-preview`, enables `workers_dev`, and does not attach a production route. The deploy script asserts that the preview config has no `route` or `routes` before deployment.
 
 ## Production deploy
 
-Production deploys are manual only. Merging a PR must not deploy production.
+Production deploys are manual only and run only from the `main` branch. Merging a PR must not deploy production.
 
 From GitHub Actions, run **Deploy Worker Production**. The job uses the GitHub `production` environment, so configure required reviewers/protection there before use. Locally, with Cloudflare credentials exported:
 
@@ -59,6 +61,8 @@ npm run deploy:production
 ```
 
 This uses `wrangler.jsonc` and deploys Worker name `autonomi-md-proxy` to route `autonomi.com/*`.
+
+The deploy script asserts the production Worker name and route before deployment.
 
 ## Smoke tests
 

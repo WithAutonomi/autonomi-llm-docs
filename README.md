@@ -9,6 +9,7 @@ This repository contains:
 - **llms.txt** - Main index file following the [llms.txt standard](https://llmstxt.org/)
 - **Markdown documentation** - Clean, comprehensive content about Autonomi's architecture, features, and developer experience
 - **Page variants** - `.md` versions of key autonomi.com pages for AI consumption
+- **Cloudflare Worker config** - Source-controlled Worker code and manual deployment workflows in [`worker/`](worker/README.md)
 
 ## How It Works
 
