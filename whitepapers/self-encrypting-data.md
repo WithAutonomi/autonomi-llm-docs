@@ -17,21 +17,21 @@ This paper presents a system of encryption that requires no user intervention or
 
 ## Contents
 
-- [I. Introduction](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#i-introduction)
-    - [I-A. The Issues Addressed by this Paper](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#i-a-the-issues-addressed-by-this-paper)
-    - [I-B. Conventions Used](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#i-b-conventions-used)
-    - [I-C. Symmetric Encryption](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#i-c-symmetric-encryption)
-    - [I-D. Cryptographically Secure Hash](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#i-d-cryptographically-secure-hash)
-- [II. Implementation](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#ii-implementation)
-    - [II-A. Overview](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#ii-a-overview)
-    - [II-B. File Chunking](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#ii-b-file-chunking)
-    - [II-C. Encryption Step](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#ii-c-encryption-step)
-    - [II-D. Obfuscation Step](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#ii-d-obfuscation-step)
-    - [II-E. Data Map](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#ii-e-data-map)
-- [III. Future works](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iii-future-works)
-- [IV. Conclusions](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iv-conclusions)
-- [References](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#references)
-- [Biographies](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#biographies)
+- [I. Introduction](#i-introduction)
+    - [I-A. The Issues Addressed by this Paper](#i-a-the-issues-addressed-by-this-paper)
+    - [I-B. Conventions Used](#i-b-conventions-used)
+    - [I-C. Symmetric Encryption](#i-c-symmetric-encryption)
+    - [I-D. Cryptographically Secure Hash](#i-d-cryptographically-secure-hash)
+- [II. Implementation](#ii-implementation)
+    - [II-A. Overview](#ii-a-overview)
+    - [II-B. File Chunking](#ii-b-file-chunking)
+    - [II-C. Encryption Step](#ii-c-encryption-step)
+    - [II-D. Obfuscation Step](#ii-d-obfuscation-step)
+    - [II-E. Data Map](#ii-e-data-map)
+- [III. Future works](#iii-future-works)
+- [IV. Conclusions](#iv-conclusions)
+- [References](#references)
+- [Biographies](#biographies)
 
 ---
 
@@ -82,7 +82,7 @@ Early hash algorithms such as MD4, MD5 and even early SHA are considered broken,
 
 1. Split into several chunks (C<sub>n</sub>).
 2. Take hash of each chunk (Hc<sub>n</sub>).
-3. In case of AES or similar cypher, use [keysize] (C<sub>n−1</sub>) as the key, use [next bytes iv size](https://claude.ai/chat/C%3Csub%3En%E2%88%921%3C/sub%3E) as the IV. (for AES 0 to 32 == key and 32 to 48 == iv)
+3. In case of AES or similar cypher, use [keysize] (C<sub>n−1</sub>) as the key, use [next bytes iv size] (C<sub>n−1</sub>) as the IV. (for AES 0 to 32 == key and 32 to 48 == iv)
 4. Create obfuscation chunk (OBFC<sub>n</sub>) by concatenating the hashes of other chunks (C<sub>n</sub>, [unused part of]C<sub>n−1</sub> and C<sub>n−2</sub>).
 5. Run encryption cypher or similar reversible method on (C<sub>n</sub>), to produce (C<sub>random</sub>).
 6. Now data is considered to be randomised and of the same length as input data.
@@ -118,9 +118,9 @@ The chunks are created with fixed size to ensure the set required to recreate th
 
 In the encryption stage, we require two separate non deterministic pieces of data, the encryption key (or password) and the Initialisation Vector (IV). To ensure all data encrypts to the same end result we determine the IV from what can be considered non deterministic data<sup>3</sup>, that being the hash of one of the chunks.
 
-**Definition 9.** Encrypt with key and IV is shown as Enc[key][IV](https://claude.ai/chat/data) in the following example. It is assumed the key and the IV for chunk n are derived from separate portions of the hash of chunk n − 1. In the case of AES for instance the first 32 bytes of this hash are the Key and the next 16 bytes may be presumed to be the IV. Therefore these items are selected from random data, although the randomness can be deterministic (if we can guess the output of an algorithm such as AES, by guessing the input parameters, i.e. brute force) on the case of a one way function such as a cryptographic hash (as discussed).
+**Definition 9.** Encrypt with key and IV is shown as Enc\[key\]\[IV\](data) in the following example. It is assumed the key and the IV for chunk n are derived from separate portions of the hash of chunk n − 1. In the case of AES for instance the first 32 bytes of this hash are the Key and the next 16 bytes may be presumed to be the IV. Therefore these items are selected from random data, although the randomness can be deterministic (if we can guess the output of an algorithm such as AES, by guessing the input parameters, i.e. brute force) on the case of a one way function such as a cryptographic hash (as discussed).
 
-**Example 10.** Enc[H(C<sub>n−1</sub>)<sub>first32bytes</sub>][H(C<sub>n−1</sub>)<sub>bytes32to48</sub>](https://claude.ai/chat/C%3Csub%3En%3C/sub%3E) ≡ E<sub>n</sub>
+**Example 10.** Enc\[H(C<sub>n−1</sub>)<sub>first32bytes</sub>\]\[H(C<sub>n−1</sub>)<sub>bytes32to48</sub>\](C<sub>n</sub>) ≡ E<sub>n</sub>
 
 <sup>3</sup>This is an area of debate as to whether this is non deterministic data, in this case the argument is that the only way to determine the data is to have the original data in the first place, therefore there is no need to determine keys as it would be fruitless. This is somewhat of a philosophical debate and likely to be the topic of a few furled eyebrows over a few drams in a few bars for a few years to come.
 
