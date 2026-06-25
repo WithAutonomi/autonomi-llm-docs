@@ -108,7 +108,9 @@ The Worker does not currently serve `.pdf` files from `autonomi.com`. Whitepaper
 
 Do not use relative PDF links such as `Autonomous-Network.pdf` from a served Markdown page, because that would resolve against `autonomi.com` and fall through to Framer rather than serving the file from this repo.
 
-Repository-internal material should not be published as canonical Autonomi documentation. Put internal or operational files under an internal prefix, or use a non-served extension such as `.markdown`.
+Under the current policy, any `.md` file outside internal prefixes can be served from `autonomi.com`. This includes repo-level and governance Markdown such as `README.md` and `docs/adr/*.md`; those files are intentionally visible as public repository context.
+
+Operational or maintenance material that should not be published as canonical Autonomi documentation should live under an internal prefix, or use a non-served extension such as `.markdown`.
 
 Internal prefixes not served from GitHub raw content:
 
