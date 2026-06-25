@@ -17,25 +17,25 @@ Distributed file systems require servers or control nodes. Access to a file syst
 
 ## Contents
 
-- [I Introduction](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#i-introduction)
-    - [I-A Conventions Used](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#i-a-conventions-used)
-    - [I-B Security of Data](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#i-b-security-of-data)
-- [II Overview](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#ii-overview)
-- [III Distributed Directories](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-distributed-directories)
-    - [III-A General](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-a-general)
-    - [III-B Creation Process](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-b-creation-process)
-    - [III-C Encryption of Directory Entries](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-c-encryption-of-directory-entries)
-    - [III-D Advantages of Distributed Directories](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-d-advantages-of-distributed-directories)
-    - [III-E Data Locks](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-e-data-locks)
-    - [III-F Private Shared Directory Structures](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-f-private-shared-directory-structures)
-        - [III-F1 Creating a Shared Root Directory](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-f1-creating-a-shared-root-directory)
-        - [III-F2 Getting Access to a Private Shared Directory](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-f2-getting-access-to-a-private-shared-directory)
-        - [III-F3 Revoking Access to a Private Shared Directory](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-f3-revoking-access-to-a-private-shared-directory)
-    - [III-G Public Shared Directory Structures](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-g-public-shared-directory-structures)
-    - [III-H Anonymous Shared Directory Structures](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-h-anonymous-shared-directory-structures)
-- [IV Conclusions](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iv-conclusions)
-- [References](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#references)
-- [Biographies](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#biographies)
+- [I Introduction](#i-introduction)
+    - [I-A Conventions Used](#i-a-conventions-used)
+    - [I-B Security of Data](#i-b-security-of-data)
+- [II Overview](#ii-overview)
+- [III Distributed Directories](#iii-distributed-directories)
+    - [III-A General](#iii-a-general)
+    - [III-B Creation Process](#iii-b-creation-process)
+    - [III-C Encryption of Directory Entries](#iii-c-encryption-of-directory-entries)
+    - [III-D Advantages of Distributed Directories](#iii-d-advantages-of-distributed-directories)
+    - [III-E Data Locks](#iii-e-data-locks)
+    - [III-F Private Shared Directory Structures](#iii-f-private-shared-directory-structures)
+        - [III-F1 Creating a Shared Root Directory](#iii-f1-creating-a-shared-root-directory)
+        - [III-F2 Getting Access to a Private Shared Directory](#iii-f2-getting-access-to-a-private-shared-directory)
+        - [III-F3 Revoking Access to a Private Shared Directory](#iii-f3-revoking-access-to-a-private-shared-directory)
+    - [III-G Public Shared Directory Structures](#iii-g-public-shared-directory-structures)
+    - [III-H Anonymous Shared Directory Structures](#iii-h-anonymous-shared-directory-structures)
+- [IV Conclusions](#iv-conclusions)
+- [References](#references)
+- [Biographies](#biographies)
 
 ---
 
@@ -56,16 +56,16 @@ There is scope for confusion when using the term "key", as sometimes it refers t
 - **Node** ≡ a network resource which is a process, sometimes referred to as a vault in other papers. This is the computer program that maintains the network and on its own is not very special. It is in collaboration that this Node becomes part of a very complex, sophisticated and efficient network.
 - **H** ≡ Hash function such as SHA, MD5, etc.
 - **XXX<sub>priv</sub>, XXX<sub>pub</sub>** ≡ Private and public keys respectively of cryptographic key pair named XXX
-- **SymEnc[PASS](https://claude.ai/chat/Data)** ≡ Symmetrically encrypt Data using PASS
-- **Sig[K<sub>priv</sub>](https://claude.ai/chat/Data)** ≡ Create asymmetric signature of Data using K<sub>priv</sub>
+- **SymEnc\[PASS\](Data)** ≡ Symmetrically encrypt Data using PASS
+- **Sig\[K<sub>priv</sub>\](Data)** ≡ Create asymmetric signature of Data using K<sub>priv</sub>
 - **+** ≡ Concatenation
 - **⊕** ≡ Bitwise Exclusive Or (XOR)
 - **STORE** ≡ Network or other key addressable storage system
-- **PutV[Key](https://claude.ai/chat/Value)** ≡ Store Value under Key on STORE. This value is signed.
+- **PutV\[Key\](Value)** ≡ Store Value under Key on STORE. This value is signed.
 
 ### I-B. Security of Data
 
-In order to achieve data security, nodes requesting a PutV[Key](https://claude.ai/chat/Value) must sign both Value and the request itself. STORE must only allow subsequent changes to Value if the request and replacement Value are similarly signed.
+In order to achieve data security, nodes requesting a PutV\[Key\](Value) must sign both Value and the request itself. STORE must only allow subsequent changes to Value if the request and replacement Value are similarly signed.
 
 ---
 
@@ -93,8 +93,8 @@ The process to create a subdirectory (Child) of a directory (Parent which has id
 2. Derive the Child's identifier (ChildID) from ChildKey (e.g. by appending random data)
 3. Add a new entry<sup>2</sup> which includes ChildID in Parent to represent Child
 4. Encrypt Parent and Child (yielding ParentEnc and ChildEnc respectively) as described below
-5. PutV[ParentKey](https://claude.ai/chat/ParentEnc)
-6. PutV[ChildKey](https://claude.ai/chat/ChildEnc)
+5. PutV\[ParentKey\](ParentEnc)
+6. PutV\[ChildKey\](ChildEnc)
 
 <sup>2</sup>The entry may also contain all required metadata of Child.
 
@@ -106,7 +106,7 @@ This uses a process very similar to that described in Self Encrypting Data [1]. 
 2. Where H(ChildID + ParentID) is named Obf, create a data chunk (ObfChunk) which is the same size as ChildDM by repeatedly rehashing Obf and appending the result, i.e. Obf + H(Obf) + H(H(Obf)) + ...
 3. Create an obfuscated datamap, ObfDM = ChildDM ⊕ ObfChunk
 4. Create a symmetric encryption passphrase, Pass = H(ParentID + ChildID)
-5. Finally, create the encrypted datamap, EncDM = SymEnc[Pass](https://claude.ai/chat/ObfDM)
+5. Finally, create the encrypted datamap, EncDM = SymEnc\[Pass\](ObfDM)
 
 ### III-D. Advantages of Distributed Directories
 
@@ -140,16 +140,16 @@ To enable private shared directory structures, two issues need to be addressed; 
 Creating a shared root directory is as per III-B above with the exception of the encryption element. The node creating the shared root directory cannot allow peers to know the ParentID for the directory (for security reasons). A replacement is derived, and the encryption phase is carried out as per III-C. Creating and storing the replacement for ParentID is completed as follows<sup>4</sup>:
 
 1. Create a key pair ShareOwn<sub>priv</sub> and ShareOwn<sub>pub</sub>
-2. Create an ID for the share owner, ShareOwnID = H(ShareOwn<sub>pub</sub> + Sig[ShareOwn<sub>priv</sub>](https://claude.ai/chat/ShareOwn%3Csub%3Epub%3C/sub%3E))
-3. PutV[ShareOwnID](ShareOwn<sub>pub</sub> + Sig[ShareOwn<sub>priv</sub>](https://claude.ai/chat/ShareOwn%3Csub%3Epub%3C/sub%3E))
+2. Create an ID for the share owner, ShareOwnID = H(ShareOwn<sub>pub</sub> + Sig\[ShareOwn<sub>priv</sub>\](ShareOwn<sub>pub</sub>))
+3. PutV\[ShareOwnID\](ShareOwn<sub>pub</sub> + Sig\[ShareOwn<sub>priv</sub>\](ShareOwn<sub>pub</sub>))
 4. Create a key pair Share<sub>priv</sub> and Share<sub>pub</sub>
-5. Create an ID for the share, ShareID = H(Share<sub>pub</sub> + Sig[ShareOwn<sub>priv</sub>](https://claude.ai/chat/Share%3Csub%3Epub%3C/sub%3E))
-6. PutV[ShareID](Share<sub>pub</sub> + Sig[ShareOwn<sub>priv</sub>](https://claude.ai/chat/Share%3Csub%3Epub%3C/sub%3E))
+5. Create an ID for the share, ShareID = H(Share<sub>pub</sub> + Sig\[ShareOwn<sub>priv</sub>\](Share<sub>pub</sub>))
+6. PutV\[ShareID\](Share<sub>pub</sub> + Sig\[ShareOwn<sub>priv</sub>\](Share<sub>pub</sub>))
 7. H(Share<sub>pub</sub>) is now used as the replacement for ParentID
 
 <sup>4</sup>Steps 1 to 6 describe creating a self-signed identity packet as detailed in "Peer to Peer" Public Key Infrastructure[3]
 
-Normally, a node storing an encrypted datamap EncDM of a private non-shared directory would sign the PutV[DirectoryKey](https://claude.ai/chat/EncDM) request and data with a cryptographic private key (K<sub>priv</sub>) known only to itself. A single K<sub>priv</sub> could be used for all directories, regardless of whether they are in the same tree or not.
+Normally, a node storing an encrypted datamap EncDM of a private non-shared directory would sign the PutV\[DirectoryKey\](EncDM) request and data with a cryptographic private key (K<sub>priv</sub>) known only to itself. A single K<sub>priv</sub> could be used for all directories, regardless of whether they are in the same tree or not.
 
 However, in the case of a shared directory, peers must be able to modify it, i.e. they must be able to sign modified datamaps and requests with the original private key. For this reason, the Share<sub>priv</sub> is used when storing an encrypted datamap of a shared directory. The same Share<sub>priv</sub> is used for all subdirectories of the shared root. However, each new shared root directory must have a unique Share<sub>priv</sub> to enable peer permissions to be assigned on a 'per-shared-directory' basis.
 

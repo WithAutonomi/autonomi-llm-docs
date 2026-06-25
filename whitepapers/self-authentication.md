@@ -18,27 +18,27 @@ Today all known mechanisms that grant access to distributed or shared services a
 
 ## Contents
 
-- [I. Introduction](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#i-introduction)
-- [II. Implementation](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#ii-implementation)
-    - [II-A. Issues to be Solved](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#ii-a-issues-to-be-solved)
-    - [II-B. Conventions](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#ii-b-conventions)
-    - [II-C. Overview of Self-Authentication](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#ii-c-overview-of-self-authentication)
-        - [II-C1. Requirements](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#ii-c1-requirements)
-        - [II-C2. Methodology](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#ii-c2-methodology)
-- [III. Detailed Implementation](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iii-detailed-implementation)
-    - [III-A. Creation of an Account](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iii-a-creation-of-an-account)
-    - [III-B. Login / Load Session Process](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iii-b-login-load-session-process)
-    - [III-C. Logout / Save Session Process](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iii-c-logout-save-session-process)
-    - [III-D. Fallback Account Packets](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iii-d-fallback-account-packets)
-        - [III-D1. Updated Account Creation Process](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iii-d1-updated-account-creation-process)
-        - [III-D2. Updated Login Process](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iii-d2-updated-login-process)
-        - [III-D3. Updated Logout / Save Session Process](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iii-d3-updated-logout-save-session-process)
-    - [III-E. Further Enhancements](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iii-e-further-enhancements)
-        - [III-E1. Time Based Obfuscation](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iii-e1-time-based-obfuscation)
-        - [III-E2. Distributed Storage System](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iii-e2-distributed-storage-system)
-- [IV. Conclusions](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#iv-conclusions)
-- [References](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#references)
-- [Biographies](https://claude.ai/chat/eb301622-04c3-42a5-a2de-c82758ab3324#biographies)
+- [I. Introduction](#i-introduction)
+- [II. Implementation](#ii-implementation)
+    - [II-A. Issues to be Solved](#ii-a-issues-to-be-solved)
+    - [II-B. Conventions](#ii-b-conventions)
+    - [II-C. Overview of Self-Authentication](#ii-c-overview-of-self-authentication)
+        - [II-C1. Requirements](#ii-c1-requirements)
+        - [II-C2. Methodology](#ii-c2-methodology)
+- [III. Detailed Implementation](#iii-detailed-implementation)
+    - [III-A. Creation of an Account](#iii-a-creation-of-an-account)
+    - [III-B. Login / Load Session Process](#iii-b-login--load-session-process)
+    - [III-C. Logout / Save Session Process](#iii-c-logout--save-session-process)
+    - [III-D. Fallback Account Packets](#iii-d-fallback-account-packets)
+        - [III-D1. Updated Account Creation Process](#iii-d1-updated-account-creation-process)
+        - [III-D2. Updated Login Process](#iii-d2-updated-login-process)
+        - [III-D3. Updated Logout / Save Session Process](#iii-d3-updated-logout--save-session-process)
+    - [III-E. Further Enhancements](#iii-e-further-enhancements)
+        - [III-E1. Time Based Obfuscation](#iii-e1-time-based-obfuscation)
+        - [III-E2. Distributed Storage System](#iii-e2-distributed-storage-system)
+- [IV. Conclusions](#iv-conclusions)
+- [References](#references)
+- [Biographies](#biographies)
 
 ---
 
@@ -68,12 +68,12 @@ There is scope for confusion when using the term "key", as sometimes it refers t
 
 - **H** ≡ Hash function such as SHA, MD5, etc.
 - **PBKDF2[Passphrase][Salt]** ≡ Password-Based Key Derivation Function or similar.
-- **SymEnc[K](https://claude.ai/chat/Data)** ≡ Symmetrically encrypt Data using K.
-- **SymDec[K](https://claude.ai/chat/Data)** ≡ Symmetrically decrypt Data using K.
+- **SymEnc\[K\](Data)** ≡ Symmetrically encrypt Data using K.
+- **SymDec\[K\](Data)** ≡ Symmetrically decrypt Data using K.
 - **+** ≡ Concatenation.
-- **PutV[Key](https://claude.ai/chat/Value)** ≡ Store a Value under the given Key.
+- **PutV\[Key\](Value)** ≡ Store a Value under the given Key.
 - **GetV[Key]** ≡ Retrieve the Value identified by Key.
-- **DelV[Key](https://claude.ai/chat/Value)** ≡ Delete Value identified by Key. Value must be provided as multiple values can be stored under a single key.
+- **DelV\[Key\](Value)** ≡ Delete Value identified by Key. Value must be provided as multiple values can be stored under a single key.
 
 ### II-C. Overview of Self-Authentication
 
@@ -99,22 +99,22 @@ PBKDF2 is used here to strengthen any password keys used. This is required as us
 
 1. GetV[H(U+S)] ≡ False (Ensure uniqueness)
 2. Generate random string RndStr
-3. PutV[H(U+S)] (SymEnc[PBKDF2[U][S]](https://claude.ai/chat/RndStr)) (Store Access Packet)
-4. PutV[H(U+S+RndStr)] (SymEnc[PBKDF2[W][S]](https://claude.ai/chat/Account)) (Store Account Packet)
+3. PutV\[H(U+S)\] (SymEnc\[PBKDF2[U][S]\](RndStr)) (Store Access Packet)
+4. PutV\[H(U+S+RndStr)\] (SymEnc\[PBKDF2[W][S]\](Account)) (Store Account Packet)
 
 ### III-B. Login / Load Session Process
 
-1. SymDec[PBKDF2[U][S]](https://claude.ai/chat/GetV%5BH\(U+S\)%5D) ≡ RndStr
-2. SymDec[PBKDF2[W][S]](https://claude.ai/chat/GetV%5BH\(U+S+RndStr\)%5D) ≡ Account
+1. SymDec\[PBKDF2[U][S]\](GetV\[H(U+S)\]) ≡ RndStr
+2. SymDec\[PBKDF2[W][S]\](GetV\[H(U+S+RndStr)\]) ≡ Account
 
 For the following operation, RndStr should be kept locally for the duration of the session.
 
 ### III-C. Logout / Save Session Process
 
 1. Generate new random string RndStr<sub>new</sub>
-2. PutV[H(U+S+RndStr<sub>new</sub>)] (SymEnc[PBKDF2[W][S]](https://claude.ai/chat/Account)) (Store new Account Packet)
-3. PutV[H(U+S)] (SymEnc[PBKDF2[U][S]](https://claude.ai/chat/RndStr%3Csub%3Enew%3C/sub%3E)) (Update Access Packet)
-4. DelV[H(U+S+RndStr)](https://claude.ai/chat/OldAccount) (Delete old Account Packet)
+2. PutV\[H(U+S+RndStr<sub>new</sub>)\] (SymEnc\[PBKDF2[W][S]\](Account)) (Store new Account Packet)
+3. PutV\[H(U+S)\] (SymEnc\[PBKDF2[U][S]\](RndStr<sub>new</sub>)) (Update Access Packet)
+4. DelV\[H(U+S+RndStr)\](OldAccount) (Delete old Account Packet)
 
 ### III-D. Fallback Account Packets
 
@@ -125,31 +125,31 @@ The previous sections outlined the basic system of authentication. However, this
 1. GetV[H(U+S)] ≡ False (Ensure uniqueness of Access Packet)
 2. GetV[H(U+(S−1))] ≡ False (Ensure uniqueness of fallback Access Packet)
 3. Generate random string RndStr and copy RndStr → RndStr<sub>fallback</sub>
-4. PutV[H(U+S)] (SymEnc[PBKDF2[U][S]](https://claude.ai/chat/RndStr))
-5. PutV[H(U+(S−1))] (SymEnc[PBKDF2[U][S−1]](https://claude.ai/chat/RndStr))
-6. PutV[H(U+S+RndStr)] (SymEnc[PBKDF2[W][S]](https://claude.ai/chat/Account))
+4. PutV\[H(U+S)\] (SymEnc\[PBKDF2[U][S]\](RndStr))
+5. PutV\[H(U+(S−1))\] (SymEnc\[PBKDF2[U][S−1]\](RndStr))
+6. PutV\[H(U+S+RndStr)\] (SymEnc\[PBKDF2[W][S]\](Account))
 
 In this case, the random strings in the Access Packets are the same, thus point to the same (unique) Account Packet. Fallback packets are only kept once the Account Packet is updated.
 
 #### III-D2. Updated Login Process
 
 1. if (GetV[H(U+S)] ≡ EncRndStr)
-    1. SymDec[PBKDF2[U][S]](https://claude.ai/chat/EncRndStr) ≡ RndStr
-    2. SymDec[PBKDF2[W][S]](https://claude.ai/chat/GetV%5BH\(U+S+RndStr\)%5D) ≡ Account
+    1. SymDec\[PBKDF2[U][S]\](EncRndStr) ≡ RndStr
+    2. SymDec\[PBKDF2[W][S]\](GetV\[H(U+S+RndStr)\]) ≡ Account
 2. else (or if previous attempt failed)
     1. GetV[H(U+(S−1))] ≡ EncRndStr<sub>fallback</sub>
-    2. SymDec[PBKDF2[U][S−1]](https://claude.ai/chat/EncRndStr%3Csub%3Efallback%3C/sub%3E) ≡ RndStr<sub>fallback</sub>
-    3. SymDec[PBKDF2[W][S−1]](https://claude.ai/chat/GetV%5BH\(U+S+RndStr%3Csub%3Efallback%3C/sub%3E\)%5D) ≡ Account<sub>fallback</sub>
+    2. SymDec\[PBKDF2[U][S−1]\](EncRndStr<sub>fallback</sub>) ≡ RndStr<sub>fallback</sub>
+    3. SymDec\[PBKDF2[W][S−1]\](GetV\[H(U+S+RndStr<sub>fallback</sub>)\]) ≡ Account<sub>fallback</sub>
 
 #### III-D3. Updated Logout / Save Session Process
 
 Designate existing RndStr as RndStr<sub>old</sub> and RndStr<sub>fallback</sub> as RndStr<sub>fallback old</sub>
 
 1. Generate new random string RndStr<sub>new</sub>
-2. PutV[H(U+S)] (SymEnc[PBKDF2[U][S]](https://claude.ai/chat/RndStr%3Csub%3Enew%3C/sub%3E)) (Update Access Packet with new random string)
-3. PutV[H(U+(S−1))] (SymEnc[PBKDF2[U][S−1]](https://claude.ai/chat/RndStr%3Csub%3Eold%3C/sub%3E)) (Update fallback Access Packet with old random string)
-4. PutV[H(U+S+RndStr<sub>new</sub>)] (SymEnc[PBKDF2[W][S]](https://claude.ai/chat/Account)) (Update Account Packet using new random string)
-5. DelV[H(U+S+RndStr<sub>fallback old</sub>)](Account<sub>fallback old</sub>) (Delete old Account Packet)
+2. PutV\[H(U+S)\] (SymEnc\[PBKDF2[U][S]\](RndStr<sub>new</sub>)) (Update Access Packet with new random string)
+3. PutV\[H(U+(S−1))\] (SymEnc\[PBKDF2[U][S−1]\](RndStr<sub>old</sub>)) (Update fallback Access Packet with old random string)
+4. PutV\[H(U+S+RndStr<sub>new</sub>)\] (SymEnc\[PBKDF2[W][S]\](Account)) (Update Account Packet using new random string)
+5. DelV\[H(U+S+RndStr<sub>fallback old</sub>)\](Account<sub>fallback old</sub>) (Delete old Account Packet)
 
 The previous Account Packet remains untouched, instead the fallback Access Packet is redirected to it and the normal Access Packet points to the new Account Packet. The previous fallback Account Packet is deleted. This is a security measure to hinder slow brute-force attacks on decrypting the Access Packet, which by the time the cleartext random string is obtained would make it obsolete.
 

@@ -15,42 +15,42 @@ Autonomous networks are self-healing, self-managing and most importantly indepen
 ---
 ## Contents
 
-- [I Introduction](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#i-introduction)
-    - [I-A Prerequisites](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#i-a-prerequisites)
-    - [I-B General Conventions](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#i-b-general-conventions)
-    - [I-C Specific Conventions](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#i-c-specific-conventions)
-        - [I-C1 Network Identities](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#i-c1-network-identities)
-        - [I-C2 Storing and Deleting Encrypted Data Chunks](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#i-c2-storing-and-deleting-encrypted-data-chunks)
-- [II Overview](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#ii-overview)
-- [III Components](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-components)
-    - [III-A Kademlia Component](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-a-kademlia-component)
-        - [III-A1 Knode](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-a1-knode)
-        - [III-A2 Kademlia RPCs](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-a2-kademlia-rpcs)
-    - [III-B Overlay Component](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-b-overlay-component)
-        - [III-B1 Node](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-b1-node)
-        - [III-B2 Node RPCs](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-b2-node-rpcs)
-        - [III-B3 Roles](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-b3-roles)
-    - [III-C Accounts](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-c-accounts)
-    - [III-D Chunk Holders](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-d-chunk-holders)
-    - [III-E Chunk Info Holders](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-e-chunk-info-holders)
-        - [III-E1 Reference Lists](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-e1-reference-lists)
-        - [III-E2 Watch Lists](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-e2-watch-lists)
-        - [III-E3 Waiting Lists](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-e3-waiting-lists)
-    - [III-F Account Holders](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iii-f-account-holders)
-- [IV Main Processes](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iv-main-processes)
-    - [IV-A Joining the Network](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iv-a-joining-the-network)
-    - [IV-B Storing a Chunk](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iv-b-storing-a-chunk)
-    - [IV-C Retrieving a Chunk](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iv-c-retrieving-a-chunk)
-    - [IV-D Deleting a Chunk](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#iv-d-deleting-a-chunk)
-- [V Maintaining Network Health](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#v-maintaining-network-health)
-    - [V-A Validity Checks by Chunk Info Holders](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#v-a-validity-checks-by-chunk-info-holders)
-    - [V-B Relocation Based on Rank](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#v-b-relocation-based-on-rank)
-    - [V-C Validity Checks by Chunk Holders](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#v-c-validity-checks-by-chunk-holders)
-    - [V-D Geographic Relocation of Chunks](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#v-d-geographic-relocation-of-chunks)
-    - [V-E Caching of Chunks](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#v-e-caching-of-chunks)
-- [VI Conclusions](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#vi-conclusions)
-- [References](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#references)
-- [Biographies](https://claude.ai/chat/e5826c79-7851-46e6-9f8c-c7767f757c6e#biographies)
+- [I Introduction](#i-introduction)
+    - [I-A Prerequisites](#i-a-prerequisites)
+    - [I-B General Conventions](#i-b-general-conventions)
+    - [I-C Specific Conventions](#i-c-specific-conventions)
+        - [I-C1 Network Identities](#i-c1-network-identities)
+        - [I-C2 Storing and Deleting Encrypted Data Chunks](#i-c2-storing-and-deleting-encrypted-data-chunks)
+- [II Overview](#ii-overview)
+- [III Components](#iii-components)
+    - [III-A Kademlia Component](#iii-a-kademlia-component)
+        - [III-A1 Knode](#iii-a1-knode)
+        - [III-A2 Kademlia RPCs](#iii-a2-kademlia-rpcs)
+    - [III-B Overlay Component](#iii-b-overlay-component)
+        - [III-B1 Node](#iii-b1-node)
+        - [III-B2 Node RPCs](#iii-b2-node-rpcs)
+        - [III-B3 Roles](#iii-b3-roles)
+    - [III-C Accounts](#iii-c-accounts)
+    - [III-D Chunk Holders](#iii-d-chunk-holders)
+    - [III-E Chunk Info Holders](#iii-e-chunk-info-holders)
+        - [III-E1 Reference Lists](#iii-e1-reference-lists)
+        - [III-E2 Watch Lists](#iii-e2-watch-lists)
+        - [III-E3 Waiting Lists](#iii-e3-waiting-lists)
+    - [III-F Account Holders](#iii-f-account-holders)
+- [IV Main Processes](#iv-main-processes)
+    - [IV-A Joining the Network](#iv-a-joining-the-network)
+    - [IV-B Storing a Chunk](#iv-b-storing-a-chunk)
+    - [IV-C Retrieving a Chunk](#iv-c-retrieving-a-chunk)
+    - [IV-D Deleting a Chunk](#iv-d-deleting-a-chunk)
+- [V Maintaining Network Health](#v-maintaining-network-health)
+    - [V-A Validity Checks by Chunk Info Holders](#v-a-validity-checks-by-chunk-info-holders)
+    - [V-B Relocation Based on Rank](#v-b-relocation-based-on-rank)
+    - [V-C Validity Checks by Chunk Holders](#v-c-validity-checks-by-chunk-holders)
+    - [V-D Geographic Relocation of Chunks](#v-d-geographic-relocation-of-chunks)
+    - [V-E Caching of Chunks](#v-e-caching-of-chunks)
+- [VI Conclusions](#vi-conclusions)
+- [References](#references)
+- [Biographies](#biographies)
 
 ---
 
@@ -74,9 +74,9 @@ There is scope for confusion when using the term "key", as sometimes it refers t
 - **H** ≡ Hash function such as SHA, MD5, etc.
 - **PBKDF2[Passphrase][Salt][IterCount]** ≡ Password-Based Key Derivation Function or similar
 - **XXX<sub>priv</sub>, XXX<sub>pub</sub>** ≡ Private and public keys respectively of cryptographic key pair named XXX
-- **AsymEnc[K<sub>pub</sub>](https://claude.ai/chat/Data)** ≡ Asymmetrically encrypt Data using K<sub>pub</sub>
-- **AsymDec[K<sub>priv</sub>](https://claude.ai/chat/Data)** ≡ Asymmetrically decrypt Data using K<sub>priv</sub>
-- **Sig[K<sub>priv</sub>](https://claude.ai/chat/Data)** ≡ Create asymmetric signature of Data using K<sub>priv</sub>
+- **AsymEnc\[K<sub>pub</sub>\](Data)** ≡ Asymmetrically encrypt Data using K<sub>pub</sub>
+- **AsymDec\[K<sub>priv</sub>\](Data)** ≡ Asymmetrically decrypt Data using K<sub>priv</sub>
+- **Sig\[K<sub>priv</sub>\](Data)** ≡ Create asymmetric signature of Data using K<sub>priv</sub>
 - **+** ≡ Concatenation
 
 ### I-C. Specific Conventions
@@ -89,11 +89,11 @@ In Peer to Peer Public Key Infrastructure [2], the ability to create cryptograph
     
 - **K** ≡ The DHT replication factor.
     
-- **ANMAID** ≡ The (ANonymous Maidsafe Anonymous IDentification) packet is the root of a chain that reaches as far as the PMID (below). This is a pure packet, which means that the identity is created as H(ANMAID<sub>pub</sub> + Sig[ANMAID<sub>priv</sub>](https://claude.ai/chat/ANMAID%3Csub%3Epub%3C/sub%3E)). This identity is never stored on the network, thereby even something encrypted with this public key is not on the network at all. It is assumed that this identity is otherwise maintained securely by a system such as that described in maidsafe: A new network paradigm [4]
+- **ANMAID** ≡ The (ANonymous Maidsafe Anonymous IDentification) packet is the root of a chain that reaches as far as the PMID (below). This is a pure packet, which means that the identity is created as H(ANMAID<sub>pub</sub> + Sig\[ANMAID<sub>priv</sub>\](ANMAID<sub>pub</sub>)). This identity is never stored on the network, thereby even something encrypted with this public key is not on the network at all. It is assumed that this identity is otherwise maintained securely by a system such as that described in maidsafe: A new network paradigm [4]
     
-- **MAID** ≡ The (Maidsafe Anonymous IDentification) packet has as its identity H(MAID<sub>pub</sub> + Sig[ANMAID<sub>priv</sub>](https://claude.ai/chat/MAID%3Csub%3Epub%3C/sub%3E)). This packet is stored on the network with its identity as the key (as described in Peer to Peer Public Key Infrastructure [2]). The MAID can be used by another Node or component (even a person) to act on the network with the same authority which the PMID has. This is an important distinction from many other such systems. The ANMAID is the revocation key for this identity.
+- **MAID** ≡ The (Maidsafe Anonymous IDentification) packet has as its identity H(MAID<sub>pub</sub> + Sig\[ANMAID<sub>priv</sub>\](MAID<sub>pub</sub>)). This packet is stored on the network with its identity as the key (as described in Peer to Peer Public Key Infrastructure [2]). The MAID can be used by another Node or component (even a person) to act on the network with the same authority which the PMID has. This is an important distinction from many other such systems. The ANMAID is the revocation key for this identity.
     
-- **PMID** ≡ The (Proxy Maidsafe IDentification) packet has as its identity H(PMID<sub>pub</sub> + Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E)). The PMID<sub>priv</sub> has to be stored on the machine that runs the Node process. This is a potential security risk and therefore the system requires that the PMID identity be restricted in capability as far as possible. The MAID is the revocation key for this identity.
+- **PMID** ≡ The (Proxy Maidsafe IDentification) packet has as its identity H(PMID<sub>pub</sub> + Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>)). The PMID<sub>priv</sub> has to be stored on the machine that runs the Node process. This is a potential security risk and therefore the system requires that the PMID identity be restricted in capability as far as possible. The MAID is the revocation key for this identity.
     
 
 #### I-C2. Storing and Deleting Encrypted Data Chunks
@@ -103,10 +103,10 @@ The process for storing chunks of data is described in more detail at IV-B. Howe
 - **SignedSize** is a serialisable data object containing:
     
     1. ChunkSize in bytes
-    2. Sig[PMID<sub>priv</sub>](https://claude.ai/chat/ChunkSize)
+    2. Sig\[PMID<sub>priv</sub>\](ChunkSize)
     3. PMID identity
     4. PMID<sub>pub</sub>
-    5. Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E)
+    5. Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>)
     
     In the case of storing a chunk, the PMID is owned by the client; for deleting a chunk, it is owned by a Chunk Info Holder (covered below).
     
@@ -117,10 +117,10 @@ The process for storing chunks of data is described in more detail at IV-B. Howe
 - **StoreContract** is a serialisable data object containing:
     
     1. InnerContract
-    2. Sig[PMID<sub>priv</sub>](https://claude.ai/chat/InnerContract)
+    2. Sig\[PMID<sub>priv</sub>\](InnerContract)
     3. PMID identity
     4. PMID<sub>pub</sub>
-    5. Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E)
+    5. Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>)
     
     In the case of storing or deleting a chunk, the PMID is owned by the vault.
     
@@ -338,12 +338,12 @@ He has spent many years as a lifeboat Helmsman and is a keen sailor when time pe
 |RPC NAME|REQUEST FIELDS|RESPONSE FIELDS|PURPOSE|
 |---|---|---|---|
 |StorePrep|ChunkName, SignedSize, RequestSignature|StoreContract, ResponseSignature|Make initial agreement between client and vault to store data chunk.|
-|StoreChunk|ChunkName, Data, PMID, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature|ACK ‖ NACK|Store data chunk. PMID belongs to client.|
+|StoreChunk|ChunkName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK|Store data chunk. PMID belongs to client.|
 |GetChunk|ChunkName|ACK ‖ NACK, Data|Get data chunk.|
 |CheckChunk|ChunkName|ACK ‖ NACK|Check if the recipient has the chunk.|
 |DeleteChunk|ChunkName, SignedSize, RequestSignature|ACK ‖ NACK|Delete data chunk. RequestSignature formed using Chunk Info Holder's PMID.|
 |ValidityCheck|ChunkName, RandomData|ACK ‖ NACK, HashContent|Ensure data chunk is uncorrupted.|
-|CacheChunk|ChunkName, Data, PMID, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature|ACK ‖ NACK|Cache data chunk. PMID belongs to client.|
+|CacheChunk|ChunkName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK|Cache data chunk. PMID belongs to client.|
 
 ### Table III: Node RPCs (Chunk Information Management)
 
@@ -351,7 +351,7 @@ He has spent many years as a lifeboat Helmsman and is a keen sailor when time pe
 |---|---|---|---|
 |GetChunkReferences|ChunkName|ACK ‖ NACK, Refs(repeated)|Get Node IDs of holders of data chunk.|
 |AddToWatchList|ChunkName, SignedSize, RequestSignature|ACK ‖ NACK, UploadCount, TotalPayment|Request to be added to the list of watchers for data chunk. RequestSignature formed using client's PMID.|
-|RemoveFromWatchList|ChunkName, PMID, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature|ACK ‖ NACK|Request to be removed from the list of watchers for data chunk. RequestSignature formed using client's PMID.|
+|RemoveFromWatchList|ChunkName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK|Request to be removed from the list of watchers for data chunk. RequestSignature formed using client's PMID.|
 |AddToReferenceList|ChunkName, StoreContract, RequestSignature|ACK ‖ NACK|Request to be added to the list of Chunk Holders for data chunk. RequestSignature formed using vault's PMID.|
 
 ### Table IV: Node RPCs (Account Management)
@@ -359,32 +359,32 @@ He has spent many years as a lifeboat Helmsman and is a keen sailor when time pe
 |RPC NAME|REQUEST FIELDS|RESPONSE FIELDS|PURPOSE|
 |---|---|---|---|
 |AmendAccount|AmendmentType, AccountPMID, SignedSize, ChunkName(optional)|ACK ‖ NACK|If the AmendmentType is space offered, the request comes from a client and doesn't include a ChunkName. Otherwise, the request comes from a Chunk Info Holder and relates to storing or deleting a chunk.|
-|ExpectAmendment|AmendmentType, ChunkName, PMID, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature, AmenderPMIDs (repeated)|ACK ‖ NACK|Allows Account Holders to anticipate a forthcoming AmendAccount RPC from each of the K Chunk Info Holders (indicated in AmenderPMIDs).|
-|AccountStatus|AccountPMID, SpaceRequested, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature,|ACK ‖ NACK, SpaceOffered, SpaceGiven, SpaceTaken, AmendmentResults (optional, repeated)|Get the current status of a Node's Account. If the requester is the Account Owner, a list of all account amendments since the last AccountStatus request was made is returned also.|
+|ExpectAmendment|AmendmentType, ChunkName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature, AmenderPMIDs (repeated)|ACK ‖ NACK|Allows Account Holders to anticipate a forthcoming AmendAccount RPC from each of the K Chunk Info Holders (indicated in AmenderPMIDs).|
+|AccountStatus|AccountPMID, SpaceRequested, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature,|ACK ‖ NACK, SpaceOffered, SpaceGiven, SpaceTaken, AmendmentResults (optional, repeated)|Get the current status of a Node's Account. If the requester is the Account Owner, a list of all account amendments since the last AccountStatus request was made is returned also.|
 
 ### Table V: Node RPCs (Synchronisation of Management Data)
 
 |RPC NAME|REQUEST FIELDS|RESPONSE FIELDS|PURPOSE|
 |---|---|---|---|
-|GetSyncData|PMID, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature|ACK ‖ NACK, VaultAccountSet, ChunkInfoMap, VaultBufferPktMap|Used by a Node to retrieve serialised containers of data from close peers which it should also be responsible for holding.|
-|GetAccount|AccountPMID, PMID, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature|ACK ‖ NACK, VaultAccount|Used by a Node to retrieve an individual account from close peers which it should also be responsible for holding.|
-|GetChunkInfo|ChunkName, PMID, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature|ACK ‖ NACK, VaultChunkInfo|Used by a Node to retrieve info relating to an individual chunk from close peers which it should also be responsible for holding.|
-|GetBufferPacket|BufferPacketName, PMID, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature|ACK ‖ NACK, VaultBufferPacket|Used by a Node to retrieve an individual buffer packet from close peers which it should also be responsible for holding.|
+|GetSyncData|PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK, VaultAccountSet, ChunkInfoMap, VaultBufferPktMap|Used by a Node to retrieve serialised containers of data from close peers which it should also be responsible for holding.|
+|GetAccount|AccountPMID, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK, VaultAccount|Used by a Node to retrieve an individual account from close peers which it should also be responsible for holding.|
+|GetChunkInfo|ChunkName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK, VaultChunkInfo|Used by a Node to retrieve info relating to an individual chunk from close peers which it should also be responsible for holding.|
+|GetBufferPacket|BufferPacketName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK, VaultBufferPacket|Used by a Node to retrieve an individual buffer packet from close peers which it should also be responsible for holding.|
 
 ### Table VI: Node RPCs (Buffer Packet Management)
 
 |RPC NAME|REQUEST FIELDS|RESPONSE FIELDS|PURPOSE|
 |---|---|---|---|
-|CreateBP|BufferPacketName, Data, PMID, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature|ACK ‖ NACK|Create a buffer packet.|
-|ModifyBPInfo|BufferPacketName, Data, PMID, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature|ACK ‖ NACK|Modify a buffer packet's control information (e.g. set permissions).|
-|GetBPMessages|BufferPacketName, PMID, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature|ACK ‖ NACK, Messages (repeated)|Retrieve a buffer packet's messages.|
-|AddBPMessage|BufferPacketName, Data, PMID, PMID<sub>pub</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), RequestSignature|ACK ‖ NACK|Add a message to a buffer packet.|
+|CreateBP|BufferPacketName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK|Create a buffer packet.|
+|ModifyBPInfo|BufferPacketName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK|Modify a buffer packet's control information (e.g. set permissions).|
+|GetBPMessages|BufferPacketName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK, Messages (repeated)|Retrieve a buffer packet's messages.|
+|AddBPMessage|BufferPacketName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK|Add a message to a buffer packet.|
 
 ### Table VII: Node RPCs (Miscellaneous)
 
 |RPC NAME|REQUEST FIELDS|RESPONSE FIELDS|PURPOSE|
 |---|---|---|---|
-|SetLocalVaultOwned|PMID<sub>pub</sub>, PMID<sub>priv</sub>, Sig[MAID<sub>priv</sub>](https://claude.ai/chat/PMID%3Csub%3Epub%3C/sub%3E), SpaceOffered|ACK ‖ NACK|Take ownership of an unowned Node.|
+|SetLocalVaultOwned|PMID<sub>pub</sub>, PMID<sub>priv</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), SpaceOffered|ACK ‖ NACK|Take ownership of an unowned Node.|
 |LocalVaultOwned|Owned|ACK ‖ NACK|Query a Node's owned status.|
 |VaultStatus|StatusRequest|StatusResponse|Used to poll a vault for its current status.|
 
