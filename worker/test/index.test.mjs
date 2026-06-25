@@ -6,19 +6,19 @@ import worker from "../src/index.js";
 const GITHUB_PREFIX =
   "https://raw.githubusercontent.com/maidsafe/autonomi-llm-docs/main";
 
-async function withFetchMock(handler, pathname) {
+async function withFetchMock(handler, pathname, requestInit = undefined) {
   const originalFetch = globalThis.fetch;
   const calls = [];
 
-  globalThis.fetch = async (input) => {
+  globalThis.fetch = async (input, init) => {
     const url = typeof input === "string" ? input : input.url;
     calls.push(url);
-    return handler(url, input);
+    return handler(url, init ?? input);
   };
 
   try {
     const response = await worker.fetch(
-      new Request(`https://autonomi.com${pathname}`),
+      new Request(`https://autonomi.com${pathname}`, requestInit),
     );
     return { calls, response };
   } finally {
@@ -84,6 +84,46 @@ test("proxies llms-full.txt as plain text", async () => {
     "text/plain; charset=utf-8",
   );
   assert.equal(response.headers.get("Cache-Control"), "public, max-age=300");
+});
+
+test("proxies HEAD requests for public documentation paths", async () => {
+  const { calls, response } = await withFetchMock(
+    (url, input) => {
+      assert.equal(url, `${GITHUB_PREFIX}/overview.md`);
+      assert.equal(input.method, "HEAD");
+      return new Response(null, { status: 200 });
+    },
+    "/overview.md",
+    { method: "HEAD" },
+  );
+
+  assert.deepEqual(calls, [`${GITHUB_PREFIX}/overview.md`]);
+  assert.equal(response.status, 200);
+  assert.equal(
+    response.headers.get("Content-Type"),
+    "text/markdown; charset=utf-8",
+  );
+  assert.equal(response.headers.get("Cache-Control"), "public, max-age=300");
+});
+
+test("falls through for non-GET and non-HEAD documentation requests", async () => {
+  const { calls, response } = await withFetchMock(
+    (url, input) => {
+      assert.equal(input.method, "POST");
+      assert.ok(
+        !url.startsWith(GITHUB_PREFIX),
+        `non-GET request fetched GitHub raw: ${url}`,
+      );
+
+      return fallbackResponse(url);
+    },
+    "/overview.md",
+    { method: "POST" },
+  );
+
+  assert.deepEqual(calls, ["https://autonomi.com/overview.md"]);
+  assert.equal(response.status, 203);
+  assert.equal(await response.text(), "fallback:/overview.md");
 });
 
 test("falls through for worker internal markdown paths", async () => {

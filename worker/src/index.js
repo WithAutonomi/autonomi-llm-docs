@@ -85,12 +85,15 @@ export default {
     const url = new URL(request.url);
 
     // Intercept public .md files, llms.txt, and llms-full.txt.
-    if (shouldProxy(url.pathname)) {
+    if (
+      shouldProxy(url.pathname) &&
+      (request.method === "GET" || request.method === "HEAD")
+    ) {
       // Try to fetch from GitHub
       const githubUrl = `https://raw.githubusercontent.com/maidsafe/autonomi-llm-docs/main${url.pathname}`;
 
       try {
-        const ghResponse = await fetch(githubUrl);
+        const ghResponse = await fetch(githubUrl, { method: request.method });
 
         // If file exists in GitHub, serve it
         if (ghResponse.ok) {

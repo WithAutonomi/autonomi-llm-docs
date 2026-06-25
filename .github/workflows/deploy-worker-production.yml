@@ -32,9 +32,9 @@ jobs:
         working-directory: worker
         run: npm ci
 
-      - name: Validate production config
+      - name: Check worker
         working-directory: worker
-        run: npm run assert:production
+        run: npm run check
 
       - name: Deploy production Worker
         working-directory: worker
