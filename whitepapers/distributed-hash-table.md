@@ -28,7 +28,7 @@ An effective distributed network requires an addressing mechanism and distributi
   - [III-A. DHT Transport](#iii-a-dht-transport)
   - [III-B. Overhead Per Connection](#iii-b-overhead-per-connection)
   - [III-C. Additional Logic Required for 1st κBucket](#iii-c-additional-logic-required-for-1st-κbucket)
-  - [III-D. Using Managed Connections for All Routing Table Entries](#iii-d-using-managed-connections-for-all-routing-table-entries)
+  - [III-D. Using Managed Connections for All Routing Table Entries](#iii-d-using-managed-connections-for-all-routing-table-entries-requires-simulation---very-important)
     - [III-D1. Incoming Connections](#iii-d1-incoming-connections)
     - [III-D2. Replica Value Count](#iii-d2-replica-value-count)
   - [III-E. Recursive Lookups](#iii-e-recursive-lookups)
@@ -239,3 +239,7 @@ He is an Inventor listed on more than 20 patent submissions and was Designer of 
 He has presented technology at [Google (Seattle)](https://www.youtube.com/watch?v=fLA77zxk-vA), British Computer Society (Christmas Lecture) and many others.
 
 He has spent many years as a lifeboat Helmsman and is a keen sailor when time permits.
+
+---
+
+**Historical Note:** This MaidSafe-era paper describes DHT design work from the pre-Autonomi network architecture. Original MaidSafe_DHT terminology is preserved for historical accuracy.

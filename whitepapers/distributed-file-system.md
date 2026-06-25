@@ -216,3 +216,7 @@ He is an Inventor listed on more than 20 patent submissions and was Designer of 
 He has presented technology at Google (Seattle), British Computer Society (Christmas Lecture) and many others.
 
 He has spent many years as a lifeboat Helmsman and is a keen sailor when time permits.
+
+---
+
+**Historical Note:** This MaidSafe-era paper is retained as historical design context for what is now the Autonomi Network. Original terminology is preserved for historical accuracy.

@@ -1,7 +1,7 @@
 # Autonomous Network
 
 **Authors**: David Irvine, Fraser Hutchison, Steve Mücklisch.
-**Organistion**: MaidSafe.net, South Ayrshire, Scotland, UK.
+**Organisation**: MaidSafe.net, South Ayrshire, Scotland, UK.
 **First Published:** September 2010.
 
 **Download PDF:** [Autonomous Network Paper](https://raw.githubusercontent.com/maidsafe/autonomi-llm-docs/main/whitepapers/Autonomous-Network.pdf)
@@ -325,67 +325,67 @@ He has spent many years as a lifeboat Helmsman and is a keen sailor when time pe
 
 |RPC NAME|REQUEST FIELDS|RESPONSE FIELDS|PURPOSE|
 |---|---|---|---|
-|Ping|Ping|ACK ‖ NACK|Check peer is connected.|
+|Ping|Ping|ACK \|\| NACK|Check peer is connected.|
 |FindValue|Key|SignedValue (repeated)|Get all values stored under Key.|
 |FindNode|Key|NodeContactDetails (repeated)|Find K closest Nodes to Key.|
-|Store|Key, SignedValue, TTL, RequestSignature|ACK ‖ NACK|Store SignedValue under Key for duration of TTL. RequestSignature allows validation of ID of requester.|
-|Delete|Key, SignedValue, RequestSignature|ACK ‖ NACK|Delete SignedValue under Key. RequestSignature allows validation of ID of requester.|
-|Update|Key, OriginalSignedValue, NewSignedValue, TTL, RequestSignature|ACK ‖ NACK|Update OriginalSignedValue under Key with NewSignedValue for duration of TTL. RequestSignature allows validation of ID of requester.|
-|DownList|NodeContactDetails|ACK ‖ NACK|Suggest removing Node from routing table. Confirm Node is disconnected by sending Ping to Node before removal.|
+|Store|Key, SignedValue, TTL, RequestSignature|ACK \|\| NACK|Store SignedValue under Key for duration of TTL. RequestSignature allows validation of ID of requester.|
+|Delete|Key, SignedValue, RequestSignature|ACK \|\| NACK|Delete SignedValue under Key. RequestSignature allows validation of ID of requester.|
+|Update|Key, OriginalSignedValue, NewSignedValue, TTL, RequestSignature|ACK \|\| NACK|Update OriginalSignedValue under Key with NewSignedValue for duration of TTL. RequestSignature allows validation of ID of requester.|
+|DownList|NodeContactDetails|ACK \|\| NACK|Suggest removing Node from routing table. Confirm Node is disconnected by sending Ping to Node before removal.|
 
 ### Table II: Node RPCs (Chunk Management)
 
 |RPC NAME|REQUEST FIELDS|RESPONSE FIELDS|PURPOSE|
 |---|---|---|---|
 |StorePrep|ChunkName, SignedSize, RequestSignature|StoreContract, ResponseSignature|Make initial agreement between client and vault to store data chunk.|
-|StoreChunk|ChunkName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK|Store data chunk. PMID belongs to client.|
-|GetChunk|ChunkName|ACK ‖ NACK, Data|Get data chunk.|
-|CheckChunk|ChunkName|ACK ‖ NACK|Check if the recipient has the chunk.|
-|DeleteChunk|ChunkName, SignedSize, RequestSignature|ACK ‖ NACK|Delete data chunk. RequestSignature formed using Chunk Info Holder's PMID.|
-|ValidityCheck|ChunkName, RandomData|ACK ‖ NACK, HashContent|Ensure data chunk is uncorrupted.|
-|CacheChunk|ChunkName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK|Cache data chunk. PMID belongs to client.|
+|StoreChunk|ChunkName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK \|\| NACK|Store data chunk. PMID belongs to client.|
+|GetChunk|ChunkName|ACK \|\| NACK, Data|Get data chunk.|
+|CheckChunk|ChunkName|ACK \|\| NACK|Check if the recipient has the chunk.|
+|DeleteChunk|ChunkName, SignedSize, RequestSignature|ACK \|\| NACK|Delete data chunk. RequestSignature formed using Chunk Info Holder's PMID.|
+|ValidityCheck|ChunkName, RandomData|ACK \|\| NACK, HashContent|Ensure data chunk is uncorrupted.|
+|CacheChunk|ChunkName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK \|\| NACK|Cache data chunk. PMID belongs to client.|
 
 ### Table III: Node RPCs (Chunk Information Management)
 
 |RPC NAME|REQUEST FIELDS|RESPONSE FIELDS|PURPOSE|
 |---|---|---|---|
-|GetChunkReferences|ChunkName|ACK ‖ NACK, Refs(repeated)|Get Node IDs of holders of data chunk.|
-|AddToWatchList|ChunkName, SignedSize, RequestSignature|ACK ‖ NACK, UploadCount, TotalPayment|Request to be added to the list of watchers for data chunk. RequestSignature formed using client's PMID.|
-|RemoveFromWatchList|ChunkName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK|Request to be removed from the list of watchers for data chunk. RequestSignature formed using client's PMID.|
-|AddToReferenceList|ChunkName, StoreContract, RequestSignature|ACK ‖ NACK|Request to be added to the list of Chunk Holders for data chunk. RequestSignature formed using vault's PMID.|
+|GetChunkReferences|ChunkName|ACK \|\| NACK, Refs(repeated)|Get Node IDs of holders of data chunk.|
+|AddToWatchList|ChunkName, SignedSize, RequestSignature|ACK \|\| NACK, UploadCount, TotalPayment|Request to be added to the list of watchers for data chunk. RequestSignature formed using client's PMID.|
+|RemoveFromWatchList|ChunkName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK \|\| NACK|Request to be removed from the list of watchers for data chunk. RequestSignature formed using client's PMID.|
+|AddToReferenceList|ChunkName, StoreContract, RequestSignature|ACK \|\| NACK|Request to be added to the list of Chunk Holders for data chunk. RequestSignature formed using vault's PMID.|
 
 ### Table IV: Node RPCs (Account Management)
 
 |RPC NAME|REQUEST FIELDS|RESPONSE FIELDS|PURPOSE|
 |---|---|---|---|
-|AmendAccount|AmendmentType, AccountPMID, SignedSize, ChunkName(optional)|ACK ‖ NACK|If the AmendmentType is space offered, the request comes from a client and doesn't include a ChunkName. Otherwise, the request comes from a Chunk Info Holder and relates to storing or deleting a chunk.|
-|ExpectAmendment|AmendmentType, ChunkName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature, AmenderPMIDs (repeated)|ACK ‖ NACK|Allows Account Holders to anticipate a forthcoming AmendAccount RPC from each of the K Chunk Info Holders (indicated in AmenderPMIDs).|
-|AccountStatus|AccountPMID, SpaceRequested, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature,|ACK ‖ NACK, SpaceOffered, SpaceGiven, SpaceTaken, AmendmentResults (optional, repeated)|Get the current status of a Node's Account. If the requester is the Account Owner, a list of all account amendments since the last AccountStatus request was made is returned also.|
+|AmendAccount|AmendmentType, AccountPMID, SignedSize, ChunkName(optional)|ACK \|\| NACK|If the AmendmentType is space offered, the request comes from a client and doesn't include a ChunkName. Otherwise, the request comes from a Chunk Info Holder and relates to storing or deleting a chunk.|
+|ExpectAmendment|AmendmentType, ChunkName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature, AmenderPMIDs (repeated)|ACK \|\| NACK|Allows Account Holders to anticipate a forthcoming AmendAccount RPC from each of the K Chunk Info Holders (indicated in AmenderPMIDs).|
+|AccountStatus|AccountPMID, SpaceRequested, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature,|ACK \|\| NACK, SpaceOffered, SpaceGiven, SpaceTaken, AmendmentResults (optional, repeated)|Get the current status of a Node's Account. If the requester is the Account Owner, a list of all account amendments since the last AccountStatus request was made is returned also.|
 
 ### Table V: Node RPCs (Synchronisation of Management Data)
 
 |RPC NAME|REQUEST FIELDS|RESPONSE FIELDS|PURPOSE|
 |---|---|---|---|
-|GetSyncData|PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK, VaultAccountSet, ChunkInfoMap, VaultBufferPktMap|Used by a Node to retrieve serialised containers of data from close peers which it should also be responsible for holding.|
-|GetAccount|AccountPMID, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK, VaultAccount|Used by a Node to retrieve an individual account from close peers which it should also be responsible for holding.|
-|GetChunkInfo|ChunkName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK, VaultChunkInfo|Used by a Node to retrieve info relating to an individual chunk from close peers which it should also be responsible for holding.|
-|GetBufferPacket|BufferPacketName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK, VaultBufferPacket|Used by a Node to retrieve an individual buffer packet from close peers which it should also be responsible for holding.|
+|GetSyncData|PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK \|\| NACK, VaultAccountSet, ChunkInfoMap, VaultBufferPktMap|Used by a Node to retrieve serialised containers of data from close peers which it should also be responsible for holding.|
+|GetAccount|AccountPMID, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK \|\| NACK, VaultAccount|Used by a Node to retrieve an individual account from close peers which it should also be responsible for holding.|
+|GetChunkInfo|ChunkName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK \|\| NACK, VaultChunkInfo|Used by a Node to retrieve info relating to an individual chunk from close peers which it should also be responsible for holding.|
+|GetBufferPacket|BufferPacketName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK \|\| NACK, VaultBufferPacket|Used by a Node to retrieve an individual buffer packet from close peers which it should also be responsible for holding.|
 
 ### Table VI: Node RPCs (Buffer Packet Management)
 
 |RPC NAME|REQUEST FIELDS|RESPONSE FIELDS|PURPOSE|
 |---|---|---|---|
-|CreateBP|BufferPacketName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK|Create a buffer packet.|
-|ModifyBPInfo|BufferPacketName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK|Modify a buffer packet's control information (e.g. set permissions).|
-|GetBPMessages|BufferPacketName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK, Messages (repeated)|Retrieve a buffer packet's messages.|
-|AddBPMessage|BufferPacketName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK ‖ NACK|Add a message to a buffer packet.|
+|CreateBP|BufferPacketName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK \|\| NACK|Create a buffer packet.|
+|ModifyBPInfo|BufferPacketName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK \|\| NACK|Modify a buffer packet's control information (e.g. set permissions).|
+|GetBPMessages|BufferPacketName, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK \|\| NACK, Messages (repeated)|Retrieve a buffer packet's messages.|
+|AddBPMessage|BufferPacketName, Data, PMID, PMID<sub>pub</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), RequestSignature|ACK \|\| NACK|Add a message to a buffer packet.|
 
 ### Table VII: Node RPCs (Miscellaneous)
 
 |RPC NAME|REQUEST FIELDS|RESPONSE FIELDS|PURPOSE|
 |---|---|---|---|
-|SetLocalVaultOwned|PMID<sub>pub</sub>, PMID<sub>priv</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), SpaceOffered|ACK ‖ NACK|Take ownership of an unowned Node.|
-|LocalVaultOwned|Owned|ACK ‖ NACK|Query a Node's owned status.|
+|SetLocalVaultOwned|PMID<sub>pub</sub>, PMID<sub>priv</sub>, Sig\[MAID<sub>priv</sub>\](PMID<sub>pub</sub>), SpaceOffered|ACK \|\| NACK|Take ownership of an unowned Node.|
+|LocalVaultOwned|Owned|ACK \|\| NACK|Query a Node's owned status.|
 |VaultStatus|StatusRequest|StatusResponse|Used to poll a vault for its current status.|
 
 ---
@@ -535,3 +535,7 @@ Done  Send "Amend Account
             |
           Done
 ```
+
+---
+
+**Historical Note:** This MaidSafe-era paper describes early autonomous-network architecture for what is now the Autonomi Network. Original terminology is preserved for historical accuracy.

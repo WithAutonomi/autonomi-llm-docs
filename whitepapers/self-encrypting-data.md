@@ -144,7 +144,12 @@ In the II-A steps 1, 3 & 7 we collected important data. This data alone is enoug
 
 fh = H(H(C<sub>1</sub>) + H(C<sub>2</sub>) + ...H(C<sub>n−1</sub>))<sup>5</sup>
 
-| H(C<sub>1</sub>) | H(EX<sub>1</sub>) | | H(C<sub>2</sub>) | H(EX<sub>2</sub>) | | ... | ... | | H(C<sub>n</sub>) | H(EX<sub>n</sub>) |
+| Original chunk hash | Stored chunk hash |
+|---|---|
+| H(C<sub>1</sub>) | H(EX<sub>1</sub>) |
+| H(C<sub>2</sub>) | H(EX<sub>2</sub>) |
+| ... | ... |
+| H(C<sub>n</sub>) | H(EX<sub>n</sub>) |
 
 With this structure the names of all the chunks are in the right hand column and all keys and IVs (which are derived from the original chunk hashes) are stored in the left hand column. The file hash in the top row identifies the data element and acts as the unique key for this file. Reversing the process is now obvious.
 
@@ -160,7 +165,7 @@ This is the complete encrypt / decrypt process for each file.
 
 To provide effectiveness the algorithms presented in this paper will require the addition of a secure mechanism to protect the data map. This will be furthered in an example of self authenticating system that will use this as entry to a system.
 
-In addition the information should be looked after a network or system that is secured itself. This would require a very secure network or perhaps even the advancement of a selfmanaging, self-healing network. This will be presented in a future paper on such a system.
+In addition the information should be looked after a network or system that is secured itself. This would require a very secure network or perhaps even the advancement of a self-managing, self-healing network. This will be presented in a future paper on such a system.
 
 ## IV. Conclusions
 
