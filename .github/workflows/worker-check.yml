@@ -1,0 +1,44 @@
+name: Worker Check
+
+on:
+  pull_request:
+    paths:
+      - "worker/**"
+      - ".github/workflows/worker-check.yml"
+      - ".github/workflows/deploy-worker-preview.yml"
+      - ".github/workflows/deploy-worker-production.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "worker/**"
+      - ".github/workflows/worker-check.yml"
+      - ".github/workflows/deploy-worker-preview.yml"
+      - ".github/workflows/deploy-worker-production.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check worker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+
+      - name: Install dependencies
+        working-directory: worker
+        run: npm ci
+
+      - name: Check worker
+        working-directory: worker
+        run: npm run check
