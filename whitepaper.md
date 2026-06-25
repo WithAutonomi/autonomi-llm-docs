@@ -26,6 +26,14 @@ A network token sale may be subject to local laws and regulations. It is your re
 
 ---
 
+# Why 2.5 - What has changed?
+
+There have been some updates made to this paper that relate to the previously outlined emissions of Autonomi and some of the fundamental component designs of The Network itself. For ease of navigation, and to enable accurate tracking of all V2.5 updates, all non-highlight text in black/grey is original (an exact copy of text taken directly from White Paper 1.0). Any text highlighted in blue was content added and/or edited in V2.0 of the white paper. For V2.5 all changes and updates are highlighted in pink to make changes clear.
+
+In this Markdown edition, the text is preserved without the Notion color highlighting; the V2.5 changes are represented directly in the canonical Markdown body.
+
+---
+
 **Autonomi is a data and communications network that, through its underlying protocols, is able to provide users with a distributed, decentralized, and encrypted layer of the internet, you can think of it like a 'Layer 0'. In essence it is a decentralized, autonomous network, running on everyday devices, offering self-encryption, quantum-safe security and lifetime storage. Autonomi is able to combine the spare capacity of connected devices, anything from old consumer PCs on desks and small devices like Raspberry Pis to leftover racks in a data centre - to create a new form of globally accessible infrastructure, that can be utilized by anyone.**
 
 Autonomi allows users to securely store data, communicate, access knowledge, build businesses, run services, and create new futures without the intervention of any middlemen or gatekeepers.
@@ -160,41 +168,41 @@ Our shared ability to take back control of the internet is largely dependent on 
 
 # Autonomi 2.0: What Has Evolved
 
-Autonomi 2.0 is not an iteration. It is a fundamental evolution of the original network design - deployed across every layer of the stack to prepare the network for a world in which agents, not just humans, are the primary users.
+Autonomi 2.0 is not an iteration. It is a fundamental evolution of the original network design - deployed to address the observed shortcomings of 1.0 and made ready for a world that the original network concept was ahead of.
 
-The architecture has been restructured into distinct, separated layers: transport, DHT, trust, identity independently reinforcing each other.
+The architecture has been restructured into distinct, separated layers: transport, DHT, trust, identity, and applications. Each layer reinforces the security of the others. Sybil resistance, eclipse protection, and EigenTrust reputation scoring work in concert. Geographic diversity enforcement ensures data is distributed across regions rather than concentrated in any singular location. Software attestation verifies node integrity at the network level.
 
 ## Post-Quantum Security - The Full Picture
 
 > Autonomi 2.0 will be the world's first quantum-proof decentralised network.
 
-ML-DSA-65 handles digital signatures. ML-KEM-768 handles key exchange. These are NIST-standardised post-quantum algorithms, not experimental proposals.
+ML-DSA-65 handles digital signatures. ML-KEM-768 handles key exchange. These are NIST-standardised post-quantum cryptographic primitives — the standard the world's security agencies are actively migrating to. There is no classical fallback. Every handshake, every session key, every stored record is post-quantum from the ground up.
 
-To be precise about what this means in context of 1.0: in Autonomi 1.0, stored data chunks were content-addressed and self-encrypted — providing practical resistance against brute-force decryption. However, authentication, key exchange, and node-to-node trust relied on classical cryptography that is vulnerable to quantum attack. 2.0 closes that gap entirely.
+To be precise about what this means in context of 1.0: in Autonomi 1.0, stored data chunks were content-addressed and self-encrypted - this provided a meaningful degree of isolation and quantum-resistance for data at rest in chunk form. However, the network layer, signed data types (pointers, graph entries, scratchpad) and identity were NOT post-quantum secure. To the best of our knowledge, no decentralised network was. Autonomi 2.0 closes this gap entirely, across every component.
 
 ## 1.0 vs 2.0: Side by Side
 
 |Dimension|Autonomi 1.0|Autonomi 2.0|
 |---|---|---|
-|Cryptography|Classical encryption. Note: stored data chunks were content-addressed and self-encrypted — providing practical resistance against brute-force decryption|Post-quantum throughout: ML-DSA-65 (signatures) + ML-KEM-768 (key exchange). NIST-standardised. No classical fallback required|
+|Cryptography|Classical encryption. Note: stored data chunks were content-addressed and self-encrypted — providing a degree of isolation. However, the network layer, signed data types (pointers, graph entries, scratchpad) and identity were NOT post-quantum secure. No decentralised network was.|Post-quantum throughout: ML-DSA-65 (signatures) + ML-KEM-768 (key exchange). NIST-standardised. No classical fallback. Every handshake, session key, stored record and signed data type is quantum-proof from the ground up. World's first.|
 |Architecture|Coupled layers|Fully separated: transport, DHT, trust, identity independently reinforcing each other|
-|Node operation|Router-dependent; STUN/ICE required. Standard consumer routers frequently interfered, limiting who could reliably run a node|Native QUIC NAT traversal — works from any home connection, no configuration required|
+|Node operation|Router-dependent; STUN/ICE required. Standard consumer routers frequently interfered, limiting who could meaningfully participate.|Native QUIC NAT traversal — works from any home connection, no configuration required|
 |Data distribution|Basic distribution|Geographic diversity enforcement — data distributed across regions, not concentrated in singular locations|
 |Node integrity|No verification|Software attestation at network level (*not in initial release, will follow after)|
 |Sybil resistance|Basic|Multi-layer: Sybil resistance + eclipse protection + EigenTrust reputation scoring|
 |DHT|IPv4 only|Dual-stack IPv4 + IPv6 with separate close groups|
-|Transport|Fixed (internet only)|Adaptive — internet, Bluetooth, LoRa. Communication and persistence continue even when infrastructure is disrupted|
+|Transport|Fixed (internet only)|Adaptive — internet, Bluetooth, LoRa. Communication and persistence continue even when infrastructure does not.|
 |Trust layer|None|Network-level trust layer with software attestation|
-|Agent infrastructure|None|x0x agent-to-agent gossip network for skill sharing and agent discovery; Trusted Data Layer for verified provenance|
-|Human interface|CLI and Launchpad|Indelible 2.0 (Merkle Tree batch uploads); Fae (local AI agent — Autonomi integration entirely invisible to the user)|
+|Agent infrastructure|None|x0x agent-to-agent gossip network for skill sharing and agent discovery; Trusted Data Layer for verified, quality-guaranteed datasets|
+|Human interface|CLI and Launchpad|Indelible 2.0 (Merkle Tree batch uploads); Fae (local AI agent — Autonomi integration entirely invisible to user)|
 
 **Node Operation**
 
-Running a node from home will now work seamlessly. In 1.0, standard consumer-grade routers frequently interfered with connectivity, requiring STUN/ICE workarounds that limited who could reliably participate. 2.0 uses native QUIC NAT traversal — no configuration required.
+Running a node from home will now work seamlessly. In 1.0, standard consumer-grade routers frequently interfered with node connectivity, limiting who could meaningfully participate. In 2.0, native QUIC handles NAT traversal without STUN or ICE. No configuration. No technical barrier. A network where only sophisticated operators can run nodes isn't genuinely decentralised, this update fixes that at the architecture level.
 
 **Adaptive Transport**
 
-Autonomi 2.0 adds adaptive transport: The Network can route over alternative paths including Bluetooth and LoRa, allowing communication and data persistence to continue even when traditional internet infrastructure is disrupted.
+Autonomi 2.0 adds adaptive transport: The Network can route over alternative paths including Bluetooth and LoRa where conventional connectivity isn't available. Communication and persistence can continue even when infrastructure does not.
 
 ---
 
@@ -230,7 +238,7 @@ $$ U(t) = U_0 \times e^{kt} $$
 
 **Cumulative Uploaded Data Amount**
 
-$$ C(t) = \int_{0}^{t} U(\tau) , d\tau = \int_{0}^{t} U_0 \cdot e^{k\tau} , d\tau $$
+$$ C(t) = \int_{0}^{t} U(\tau) \, d\tau = \int_{0}^{t} U_0 \cdot e^{k\tau} \, d\tau $$
 
 $$ C(t) = \frac{U_0}{k} \left( e^{kt} - 1 \right) $$
 
@@ -298,7 +306,7 @@ To do this The Autonomi Foundation will mint new ANT tokens and distribute them 
 
 We can solve for the time when the average upload price starts to fall by finding the maximum of the price function, the expectation is that emissions will only be required in the early years of the network (to ensure and encourage its growth).
 
-$$ \frac{d,\text{P}(t)}{dt} = 0 $$
+$$ \frac{d\,\text{P}(t)}{dt} = 0 $$
 
 Recall:
 
@@ -308,7 +316,7 @@ Let:
 
 $$ A = \frac{P_0}{k} $$
 
-$$ \frac{d,\text{P}(t)}{dt} = A \left[ \frac{d}{dt} \left(1 - e^{-kt}\right) \cdot e^{-\lambda t} + \left(1 - e^{-kt}\right) \cdot \frac{d}{dt} \left(e^{-\lambda t}\right) \right] $$
+$$ \frac{d\,\text{P}(t)}{dt} = A \left[ \frac{d}{dt} \left(1 - e^{-kt}\right) \cdot e^{-\lambda t} + \left(1 - e^{-kt}\right) \cdot \frac{d}{dt} \left(e^{-\lambda t}\right) \right] $$
 
 Calculate derivatives:
 
@@ -318,11 +326,11 @@ $$ \frac{d}{dt} \left(e^{-\lambda t}\right) = -\lambda e^{-\lambda t} $$
 
 Substitute:
 
-$$ \frac{d,\text{P}(t)}{dt} = A \left[ k e^{-kt} \cdot e^{-\lambda t} - \lambda \left(1 - e^{-kt}\right) e^{-\lambda t} \right] $$
+$$ \frac{d\,\text{P}(t)}{dt} = A \left[ k e^{-kt} \cdot e^{-\lambda t} - \lambda \left(1 - e^{-kt}\right) e^{-\lambda t} \right] $$
 
-$$ \frac{d,\text{P}(t)}{dt} = A e^{-\lambda t} \left( (k + \lambda) e^{-kt} - \lambda \right) $$
+$$ \frac{d\,\text{P}(t)}{dt} = A e^{-\lambda t} \left( (k + \lambda) e^{-kt} - \lambda \right) $$
 
-Now solve for $\frac{d,\text{P}(t)}{dt} = 0$.
+Now solve for $\frac{d\,\text{P}(t)}{dt} = 0$.
 
 $$ A e^{-\lambda t} \left( (k + \lambda) e^{-kt} - \lambda \right) = 0 $$
 
@@ -400,15 +408,15 @@ This allocation represents 38% of the Maximum Supply, an increase of 8% from 1.0
 
 ### Emissions Allocation: Pool Status (Updated V2.5)
 
-The ANT token launched in February 2025 with a total supply of 1,200,000,000 tokens. Of that, 240,000,000 tokens (20% of Max Supply) were allocated to an emissions pool governed by smart contract, originally intended to incentivise node operators over a 12-year period.
+The ANT token launched in February 2025 with a total supply of 1,200,000,000 tokens. Of that, 240,000,000 tokens (20% of total supply) were allocated to The Network emissions pool which was designed to reward and stabilise node provisioning in the early days.
 
-Node emissions were paused in January 2026. To date, just 2.94% of that emissions pool has been used — approximately 7,056,000 tokens. The remaining 97.06% (~232,944,000 tokens) remains unissued.
+Node emissions were paused in January 2026. To date, just 2.94% of that emissions pool has been used - meaning over 232 million tokens remain. These tokens are not being burned.
 
-The reasoning is straightforward. Agents don't work the way humans do when it comes to financial transactions. Traditional crypto incentive models — designed around speculative early adopters manually running nodes — do not map to how autonomous agents will evaluate and adopt infrastructure. Emissions designed to attract human participants are unlikely to be the mechanism that drives agent adoption.
+The reasoning is straightforward. Agents don't work the way humans do when it comes to financial transactions. They can't easily navigate traditional finance rails: KYC requirements, banking relationships, fiat on-ramps etc. What they can do is transact natively in crypto, directly, programmatically, and at a scale and speed no human process can match. ANT is a logical fit for that.
 
-Agents will encounter Autonomi through the 2.0 storage skill available on x0x, through the Trusted Data Layer, and through integrations surfaced by Fae. Agents adopt skills and behaviours based on reason and logic, the value proposition of a capability, and the verifiability of data — not on yield farming incentives or token reward schedules.
+Agents will encounter Autonomi through the 2.0 storage skill available on x0x, through the Trusted Data Layer's data quality guarantees, and through the x0x network itself (see table under Autonomi 2.0 or autonomi.com for reference to these products). Agents adopt skills and behaviours based on reason and logic, the Autonomi infrastructure makes ANT highly practical, and means agent association with Autonomi can be built on function, not marketing.
 
-In summary, the remaining emissions pool represents significant potential for future ecosystem utilisation, the Foundation will publicly communicate any changes to the emissions pool status or strategy as they are made.
+In summary, the remaining emissions pool represents significant potential for future ecosystem utility, whether that is agentic payments, network incentives, or other mechanisms that serve the Autonomi ecosystem. No firm decisions on deployment have yet been made, but the tokens will not be burned when doing so would sacrifice their potential utility. An update to this White Paper regarding the emissions pool will be made once the tokens are set to be utilized.
 
 ### Autonomi Foundation
 
@@ -427,17 +435,17 @@ The Autonomi Foundation will receive payments via a Smart Contract with allocate
 
 ### MaidSafe Shareholders
 
-Shareholders were allocated 214,748,365 tokens by The Network, these are now available for claiming by shareholders (note: a 'wallet' will be required to take custody of tokens).
+Shareholders were allocated 214,748,365 tokens by The Network, these are now available for claiming via the distributed NFT.
 
 ---
 
 # The Difference with Autonomi
 
-Autonomi is a peer-to-peer network that seeks to use everyday devices - computers, home servers, personal devices - to provide secure, permanent data storage. No centralised infrastructure. No ongoing fees. No intermediaries.
+Autonomi is a peer-to-peer network that seeks to use everyday devices - computers, home servers, personal machines - collectively to provide permanent storage and infrastructure. No need for data centres. No company with access to or custody of your data. No subscriptions. No contracts. No ongoing payments.
 
-A person pays once to store their data and it persists. The Network self-encrypts, self-distributes, and self-heals — without any single entity controlling who can store, access, or delete information.
+A person pays once to store their data and it persists. The Network self-encrypts, self-distributes, and self-heals. Nobody can read your data but you. And nobody can take it down.
 
-Autonomi is structurally different from every alternative. Filecoin, Arweave, and Storj operate on capital-intensive infrastructure models. ICP runs on dedicated data centres. BitTorrent provides file-sharing without persistence guarantees. AWS is centralised by design. Autonomi is the only network that combines permanent storage, zero ongoing cost, commodity hardware participation, and blockchain-less data handling into a single architecture.
+Autonomi is structurally different from every alternative. Filecoin, Arweave, and Storj operate on contract-based models. Storage is negotiated and enforced through smart contracts, with intermediaries coordinating the process. Autonomi has no contracts. It has no intermediaries. It is designed as a peer-to-peer network in the complete sense of the term.
 
 |**Network**|**Autonomi**|**FileCoin**|**Storj**|**Arweave**|**Swarm**|**ICP**|**HoloChain**|**BitTorrent**|**AWS**|
 |---|---|---|---|---|---|---|---|---|---|
@@ -589,7 +597,7 @@ A machine that connects with others using the Autonomi Protocol to form the Netw
 
 ### Node Network Reserve
 
-18% of data payments (up to 10% of maximum supply) are sent to this allocation for node operators. This allocation will be used to support payments to nodes should the network upload values experience volatility.
+18% of data payments (up to 10% of maximum supply) are sent to this allocation for node operators. This allocation will be used to support payments to nodes should the network upload values experience volatility. If the Node Network Reserve holds 10% of the network's Maximum Supply of tokens, 18% payment reduces to 2%, with the 2% payment burned (removed from Maximum Supply).
 
 ### Register
 
