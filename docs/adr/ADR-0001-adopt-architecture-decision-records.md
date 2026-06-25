@@ -1,6 +1,6 @@
 # ADR-0001: Adopt Architecture Decision Records
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-06-24
 - **Decision owners:** Jim Collinson
 - **Reviewers:** Jim Collinson

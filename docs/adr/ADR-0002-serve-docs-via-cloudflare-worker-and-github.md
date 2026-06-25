@@ -1,6 +1,6 @@
 # ADR-0002: Serve documentation at autonomi.com via a Cloudflare Worker backed by GitHub
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-06-24
 - **Decision owners:** Jim Collinson
 - **Reviewers:** Jim Collinson (retrospective — author attestation)
