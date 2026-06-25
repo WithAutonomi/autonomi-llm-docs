@@ -1,0 +1,34 @@
+name: ADR Governance
+
+on:
+  pull_request:
+    paths:
+      - "docs/adr/**"
+      - ".adr-kit.yaml"
+      - "scripts/adr-governance.py"
+      - ".github/workflows/adr-governance.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/adr/**"
+      - ".adr-kit.yaml"
+      - "scripts/adr-governance.py"
+      - ".github/workflows/adr-governance.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  adr-governance:
+    name: Check ADR governance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check ADR governance
+        run: python3 scripts/adr-governance.py

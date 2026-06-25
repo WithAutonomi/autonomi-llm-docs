@@ -6,9 +6,9 @@
 - **Reviewers:** Jim Collinson (retrospective — author attestation)
 - **Supersedes:** none
 - **Superseded by:** none
-- **Related:** ADR-0001 (ADR adoption); ADR-0003 (`llms.txt`); ADR-0004 (PDF serving); planned ADR-0005 (bring Worker source under version control)
+- **Related:** ADR-0001 (ADR adoption); ADR-0003 (`llms.txt`); ADR-0004 (PDF serving); ADR-0005 (Worker source management)
 
-> **Retrospective ADR.** This record reconstructs a decision made earlier in development, before the ADR process existed in this repo. It is backfilled and proposed on 2026-06-24 (accepted on merge of this PR), on the basis of the decision owner's attestation and direct inspection of the deployed system; it was not produced by contemporaneous review.
+> **Retrospective ADR.** This record reconstructs a decision made earlier in development, before the ADR process existed in this repo. It was backfilled on 2026-06-24 and accepted by the decision owner during PR #6 review, on the basis of the decision owner's attestation and direct inspection of the deployed system; it was not produced by contemporaneous review.
 
 ## Context
 
@@ -47,9 +47,11 @@ If the GitHub fetch for a matched path does **not** return OK (e.g. the file doe
 
 For interception to work, the relevant `autonomi.com` DNS records must be **Proxied** (orange-cloud) in Cloudflare rather than DNS-only (grey-cloud), so traffic passes through Cloudflare where the Worker can act on it. DNS-only records bypass the Worker entirely and were the cause of early interception failures during development.
 
-### Current management state (as of this record)
+### Management state and later refinement
 
-The Worker source is currently authored and edited **only via the Cloudflare web UI**; it is not yet committed to or managed from any Git repository. The source reproduced in discussion is a copy, not a tracked artefact — the deployed Worker is whatever exists in the Cloudflare dashboard. Bringing the Worker under version control in this repo (with the Cloudflare UI demoted to a break-glass fallback) is planned as separate work and will be recorded in its own ADR (ADR-0005). This ADR documents the serving architecture as currently deployed; it does not decide the management approach.
+At the time this architecture was first deployed, the Worker source was authored and edited only via the Cloudflare web UI. This ADR records the serving architecture: a Cloudflare Worker in front of `autonomi.com`, GitHub raw content for machine-readable documentation, and Framer fallthrough for normal site traffic.
+
+Worker source management was decided separately in ADR-0005. ADR-0005 makes this repository the source of truth for Worker source code, Wrangler configuration, deployment workflows, and the operational runbook, with the Cloudflare dashboard reserved for observability, rollback, and break-glass recovery.
 
 ## Consequences
 
@@ -68,7 +70,7 @@ The Worker source is currently authored and edited **only via the Cloudflare web
 - The Worker's routing logic (which paths it intercepts) is an architectural surface that must be kept correct; a mistake can shadow or leak Framer routes.
 - DNS proxy status is load-bearing: flipping a record to DNS-only silently breaks doc serving.
 - Two sources of truth for one domain (Framer + GitHub) can confuse contributors who don't know the split.
-- **The Worker source is currently unversioned and Cloudflare-UI-only**: no history, no review, no rollback except by hand, and a single point of accidental change. This risk is the motivation for the planned ADR-0005.
+- At initial deployment, Worker source was unversioned and Cloudflare-UI-only. ADR-0005 addresses this by moving normal Worker source/config/deploy management into this repository while keeping Cloudflare available for observability, rollback, and break-glass recovery.
 
 ### Neutral / Operational
 
@@ -82,7 +84,7 @@ The Worker source is currently authored and edited **only via the Cloudflare web
 - `autonomi.com/llms.txt` and `autonomi.com/llms-full.txt` resolve to repo content.
 - Normal site pages still resolve to Framer.
 - Required `autonomi.com` records are Proxied in Cloudflare (owner-confirmed; not inspectable from the repo).
-- Review trigger: any change to the Worker's routing rules, the hosting of the marketing site, the DNS proxy posture, or the move of the Worker under version control (ADR-0005) requires revisiting this ADR.
+- Review trigger: any change to the Worker's routing rules, the hosting of the marketing site, the DNS proxy posture, or the Worker source-management model (ADR-0005) requires revisiting this ADR.
 
 ## Notes for AI-assisted work
 
