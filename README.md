@@ -126,7 +126,7 @@ Use internal locations for:
 
 Changing content is different from changing serving behaviour.
 
-Content-only changes normally need only a PR merge. Worker or serving-policy changes need additional review and, after merge, a manual Worker deployment. Treat these as serving changes:
+Content-only changes normally need only a PR merge. Worker or serving-policy changes need additional review and, after merge, a manual Worker deployment. For Worker changes, follow the `worker/README.markdown` runbook: deploy preview, approve the required environment review, smoke test the workers.dev URL, deploy production, approve the required environment review, and smoke test `autonomi.com`. Treat these as serving changes:
 
 - editing `worker/src/index.js`
 - changing Wrangler config

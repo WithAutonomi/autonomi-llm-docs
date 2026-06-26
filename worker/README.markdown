@@ -51,7 +51,16 @@ Because this token can update production Cloudflare resources, both deploy workf
 
 Preview deploys are manual only and run only from the `main` branch. They use the GitHub `production` environment approval gate because they use the same Cloudflare account credentials as production deploys.
 
-From GitHub Actions, run **Deploy Worker Preview**. Locally, with Cloudflare credentials exported:
+From GitHub Actions:
+
+1. Open the repository's **Actions** tab.
+2. Select **Deploy Worker Preview**.
+3. Click **Run workflow** and run it from `main`.
+4. When GitHub shows **Review deployments** for the `production` environment, approve it. Preview deploys currently need this approval because they use the same Cloudflare credentials as production, even though the preview Worker deploys only to workers.dev and does not attach the production route.
+5. Wait for the workflow to complete.
+6. Open the workflow run, open the **Deploy preview Worker** job, expand the final **Deploy preview Worker** step, and copy the workers.dev URL printed by Wrangler. It should look like `https://autonomi-md-proxy-preview.<cloudflare-workers-subdomain>.workers.dev`.
+
+Locally, with Cloudflare credentials exported:
 
 ```sh
 cd worker
@@ -64,7 +73,18 @@ This uses `wrangler.preview.jsonc`, deploys Worker name `autonomi-md-proxy-previ
 
 Production deploys are manual only and run only from the `main` branch. Merging a PR must not deploy production.
 
-From GitHub Actions, run **Deploy Worker Production**. The job uses the GitHub `production` environment, so configure and confirm required reviewers/protection there before use. Locally, with Cloudflare credentials exported:
+From GitHub Actions:
+
+1. Open the repository's **Actions** tab.
+2. Select **Deploy Worker Production**.
+3. Click **Run workflow** and run it from `main`.
+4. When GitHub shows **Review deployments** for the `production` environment, approve it.
+5. Wait for the workflow to complete.
+6. Run the production smoke tests below against the routed `autonomi.com` URLs.
+
+The job uses the GitHub `production` environment, so configure and confirm required reviewers/protection there before use.
+
+Locally, with Cloudflare credentials exported:
 
 ```sh
 cd worker
@@ -77,9 +97,11 @@ The deploy script asserts the production Worker name and route before deployment
 
 ## Smoke tests
 
-After a preview deploy, use the workers.dev URL printed by Wrangler:
+After a preview deploy, set `PREVIEW_URL` to the workers.dev URL copied from the **Deploy preview Worker** step log:
 
 ```sh
+PREVIEW_URL="https://autonomi-md-proxy-preview.<cloudflare-workers-subdomain>.workers.dev"
+
 curl -i "$PREVIEW_URL/llms.txt"
 curl -i "$PREVIEW_URL/llms-full.txt"
 curl -i "$PREVIEW_URL/overview.md"
