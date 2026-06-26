@@ -44,7 +44,7 @@ ANT is the native utility token. Total supply: 1.2B. Used for storage payments, 
 - Developer Documentation: https://docs.autonomi.com/developers
 - Run a Node: https://docs.autonomi.com/node
 - ANT Token Documentation: https://docs.autonomi.com/token
-- Who We Are: https://autonomi.com/who-we-are
+- Who We Are: https://autonomi.com/who-we-are.md
 - Publications: https://autonomi.com/publications.md
 
 ## Source Code

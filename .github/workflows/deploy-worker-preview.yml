@@ -32,9 +32,9 @@ jobs:
         working-directory: worker
         run: npm ci
 
-      - name: Validate preview config
+      - name: Check worker
         working-directory: worker
-        run: npm run assert:preview
+        run: npm run check
 
       - name: Deploy preview Worker
         working-directory: worker

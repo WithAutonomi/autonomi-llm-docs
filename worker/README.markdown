@@ -31,6 +31,7 @@ The public serving policy follows ADR-0006:
 
 - `.md` files outside internal prefixes are served from GitHub raw content.
 - `/llms.txt` and `/llms-full.txt` are served from GitHub raw content.
+- Only GET and HEAD requests are served from GitHub raw content; other HTTP methods fall through unchanged.
 - `/worker/` and `/.github/` are internal prefixes and fall through to Framer rather than being served from GitHub raw content.
 
 Keep operational documentation under internal prefixes or use a non-served extension. This runbook uses `.markdown` so it cannot be exposed by older deployed Worker versions that predate the `/worker/` exclusion rule.

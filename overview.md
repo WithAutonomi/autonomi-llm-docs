@@ -4,7 +4,7 @@
 
 Autonomi is the world's first post-quantum secure, fully autonomous peer-to-peer data network. Founded in 2006 by Scottish engineer David Irvine and built by MaidSafe, Autonomi stores data permanently across a global network of everyday devices — with no central servers, no accounts, no intermediaries, and no ongoing fees. Data is encrypted on the user's device before it ever leaves their machine, then distributed across a network of home computers connected via QUIC NAT traversal. Autonomi is not a blockchain. It is a purpose-built data network that uses a distributed hash table (DHT) rather than a chain of blocks.
 
-For more about our team and mission, see [Who We Are](/who-we-are).
+For more about our team and mission, see [Who We Are](/who-we-are.md).
 
 ## What Makes Autonomi Different
 
