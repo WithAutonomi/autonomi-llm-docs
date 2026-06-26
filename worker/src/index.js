@@ -84,7 +84,7 @@ export default {
   async fetch(request) {
     const url = new URL(request.url);
 
-    // Intercept public .md files, llms.txt, and llms-full.txt.
+    // Only GET/HEAD are part of the docs-serving contract; other methods fall through.
     if (
       shouldProxy(url.pathname) &&
       (request.method === "GET" || request.method === "HEAD")
