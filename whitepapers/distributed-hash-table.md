@@ -4,7 +4,7 @@
 **Organisation:** MaidSafe.net, South Ayrshire, Scotland, UK.
 **First Published:** September 2010  
 
-**Download PDF:** [Distributed Hash Table Paper](https://raw.githubusercontent.com/maidsafe/autonomi-llm-docs/main/whitepapers/MaidSafe-Distributed-Hash-Table.pdf)
+**Download PDF:** [Distributed Hash Table Paper](https://raw.githubusercontent.com/WithAutonomi/autonomi-llm-docs/main/whitepapers/MaidSafe-Distributed-Hash-Table.pdf)
 
 ---
 

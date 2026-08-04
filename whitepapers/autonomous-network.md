@@ -4,7 +4,7 @@
 **Organisation**: MaidSafe.net, South Ayrshire, Scotland, UK.
 **First Published:** September 2010.
 
-**Download PDF:** [Autonomous Network Paper](https://raw.githubusercontent.com/maidsafe/autonomi-llm-docs/main/whitepapers/Autonomous-Network.pdf)
+**Download PDF:** [Autonomous Network Paper](https://raw.githubusercontent.com/WithAutonomi/autonomi-llm-docs/main/whitepapers/Autonomous-Network.pdf)
 
 ---
 ## Abstract

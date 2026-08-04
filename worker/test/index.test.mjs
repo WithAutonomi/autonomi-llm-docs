@@ -4,7 +4,7 @@ import test from "node:test";
 import worker from "../src/index.js";
 
 const GITHUB_PREFIX =
-  "https://raw.githubusercontent.com/maidsafe/autonomi-llm-docs/main";
+  "https://raw.githubusercontent.com/WithAutonomi/autonomi-llm-docs/main";
 
 async function withFetchMock(handler, pathname, requestInit = undefined) {
   const originalFetch = globalThis.fetch;

@@ -104,7 +104,7 @@ When adding or updating a whitepaper:
 
 The Worker does not currently serve `.pdf` files from `autonomi.com`. Whitepaper PDF links should use explicit GitHub raw URLs, for example:
 
-`https://raw.githubusercontent.com/maidsafe/autonomi-llm-docs/main/whitepapers/Autonomous-Network.pdf`
+`https://raw.githubusercontent.com/WithAutonomi/autonomi-llm-docs/main/whitepapers/Autonomous-Network.pdf`
 
 Do not use relative PDF links such as `Autonomous-Network.pdf` from a served Markdown page, because that would resolve against `autonomi.com` and fall through to Framer rather than serving the file from this repo.
 
@@ -146,7 +146,7 @@ Serving-policy changes should be reflected in Worker tests and checked against A
 
 ## Contributing
 
-This repo is maintained by the MaidSafe team. Content should be:
+This repo is maintained by the Autonomi team. Content should be:
 
 - Written in clear, accessible markdown
 - Comprehensive enough for AI assistants to guide developers and inform those wishing to understand the technology

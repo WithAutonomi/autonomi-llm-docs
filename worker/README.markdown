@@ -11,7 +11,7 @@ This directory contains source-controlled Cloudflare Worker code and deployment 
 - `workers_dev`: disabled for production
 - Connected bindings: none
 - Observability: logs enabled with 100% sampling; traces disabled in the confirmed production inventory
-- Behaviour: serve public `.md`, `/llms.txt`, and `/llms-full.txt` paths from `maidsafe/autonomi-llm-docs` on GitHub, excluding internal prefixes `/worker/` and `/.github/`, and falling back to Framer for misses and all other paths
+- Behaviour: serve public `.md`, `/llms.txt`, and `/llms-full.txt` paths from `WithAutonomi/autonomi-llm-docs` on GitHub, excluding internal prefixes `/worker/` and `/.github/`, and falling back to Framer for misses and all other paths
 
 ## Local setup
 
