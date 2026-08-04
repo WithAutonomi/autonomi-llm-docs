@@ -6,13 +6,15 @@
 - **Reviewers:** Jim Collinson (retrospective — author attestation)
 - **Supersedes:** none
 - **Superseded by:** none
-- **Related:** ADR-0002 (Worker/GitHub serving); ADR-0003 (`llms.txt`)
+- **Related:** ADR-0002 (Worker/GitHub serving); ADR-0003 (`llms.txt`); ADR-0007 (repository transfer)
 
 > **Retrospective ADR.** This record reconstructs a decision made earlier in development, before the ADR process existed in this repo. It is backfilled and proposed on 2026-06-24 (accepted on merge of this PR), on the basis of the decision owner's attestation and direct inspection of the deployed system; it was not produced by contemporaneous review.
 
 ## Context
 
 The foundational MaidSafe whitepapers are published in two forms in this repo: a Markdown conversion (machine-readable, served at `autonomi.com/whitepapers/<paper>.md`) and the original PDF (the authoritative, citable artefact for humans). The decision to keep both forms is editorial/content and is not the subject of this ADR.
+
+The planned repository transfer in ADR-0007 prompted this Proposed ADR to use the destination `WithAutonomi` owner namespace for current raw URLs. That namespace update does not change the direct-GitHub-raw serving decision recorded here.
 
 The architectural question this ADR settles is narrower: **how should the PDF be addressed in a link, given how the serving pipeline works?** The Cloudflare Worker (ADR-0002) intercepts only `.md`, `/llms.txt`, and `/llms-full.txt`. It has no behaviour for `.pdf` requests, so a PDF path under `autonomi.com` is not served from the repo — it falls through to Framer, where the file does not exist. Therefore a relative sibling link (`<paper>.pdf`) or an apex link (`autonomi.com/whitepapers/<paper>.pdf`) from within a served Markdown page would not resolve to the PDF in the repo.
 
@@ -31,9 +33,9 @@ The architectural question this ADR settles is narrower: **how should the PDF be
 
 ## Decision
 
-Whitepaper Markdown pages link to their PDF using an explicit `raw.githubusercontent.com` URL pointing at the file in `maidsafe/autonomi-llm-docs` (branch `main`), rather than a relative sibling path or an `autonomi.com` apex path. This is because the Worker does not intercept `.pdf` requests, so only a direct GitHub-raw URL resolves to the actual file.
+Whitepaper Markdown pages link to their PDF using an explicit `raw.githubusercontent.com` URL pointing at the file in `WithAutonomi/autonomi-llm-docs` (branch `main`), rather than a relative sibling path or an `autonomi.com` apex path. This is because the Worker does not intercept `.pdf` requests, so only a direct GitHub-raw URL resolves to the actual file.
 
-Example (verified live 2026-06-24): `autonomi.com/whitepapers/autonomous-network.md` links its PDF as `https://raw.githubusercontent.com/maidsafe/autonomi-llm-docs/main/whitepapers/Autonomous-Network.pdf`.
+Post-transfer example: `autonomi.com/whitepapers/autonomous-network.md` links its PDF as `https://raw.githubusercontent.com/WithAutonomi/autonomi-llm-docs/main/whitepapers/Autonomous-Network.pdf`.
 
 If the Worker is later extended to serve PDFs from GitHub under apex URLs, this ADR should be superseded and the links migrated to canonical `autonomi.com` paths.
 
@@ -58,7 +60,7 @@ If the Worker is later extended to serve PDFs from GitHub under apex URLs, this 
 
 ## Validation
 
-- The PDF link in `autonomi.com/whitepapers/autonomous-network.md` is a `raw.githubusercontent.com` URL and downloads the correct file (verified 2026-06-24).
+- After the ADR-0007 transfer and namespace migration, the PDF link in `autonomi.com/whitepapers/autonomous-network.md` is a `raw.githubusercontent.com` URL under `WithAutonomi/autonomi-llm-docs` and downloads the correct file.
 - Review trigger: any change to Worker PDF behaviour, or to where the PDFs are hosted, or a rename of the repo/branch, requires revisiting this ADR.
 
 ## Notes for AI-assisted work
