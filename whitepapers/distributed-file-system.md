@@ -4,7 +4,7 @@
 **Organisation:** MaidSafe.net, South Ayrshire, Scotland, UK.
 **First published**: September 2010.
 
-**Download PDF:** [Distributed File System Paper](https://raw.githubusercontent.com/maidsafe/autonomi-llm-docs/main/whitepapers/MaidSafe-Distributed-File-System.pdf)
+**Download PDF:** [Distributed File System Paper](https://raw.githubusercontent.com/WithAutonomi/autonomi-llm-docs/main/whitepapers/MaidSafe-Distributed-File-System.pdf)
 
 ---
 

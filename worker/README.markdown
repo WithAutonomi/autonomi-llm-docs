@@ -2,7 +2,7 @@
 
 This directory contains source-controlled Cloudflare Worker code and deployment configuration for the existing production Worker `autonomi-md-proxy`.
 
-## Current production inventory
+## Production configuration
 
 - Worker name: `autonomi-md-proxy`
 - Production route: `autonomi.com/*`
@@ -11,7 +11,7 @@ This directory contains source-controlled Cloudflare Worker code and deployment 
 - `workers_dev`: disabled for production
 - Connected bindings: none
 - Observability: logs enabled with 100% sampling; traces disabled in the confirmed production inventory
-- Behaviour: serve public `.md`, `/llms.txt`, and `/llms-full.txt` paths from `maidsafe/autonomi-llm-docs` on GitHub, excluding internal prefixes `/worker/` and `/.github/`, and falling back to Framer for misses and all other paths
+- Source-controlled behaviour: serve public `.md`, `/llms.txt`, and `/llms-full.txt` paths from `WithAutonomi/autonomi-llm-docs` on GitHub, excluding internal prefixes `/worker/` and `/.github/`, and falling back to Framer for misses and all other paths
 
 ## Local setup
 
@@ -106,6 +106,7 @@ curl -i "$PREVIEW_URL/llms.txt"
 curl -i "$PREVIEW_URL/llms-full.txt"
 curl -i "$PREVIEW_URL/overview.md"
 curl -i "$PREVIEW_URL/worker/README.md"
+curl -i "$PREVIEW_URL/missing.md"
 curl -i "$PREVIEW_URL/"
 ```
 
@@ -118,6 +119,7 @@ curl -i https://autonomi.com/llms.txt
 curl -i https://autonomi.com/llms-full.txt
 curl -i https://autonomi.com/overview.md
 curl -i https://autonomi.com/worker/README.md
+curl -i https://autonomi.com/missing.md
 curl -i https://autonomi.com/
 ```
 

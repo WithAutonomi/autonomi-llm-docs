@@ -90,7 +90,7 @@ export default {
       (request.method === "GET" || request.method === "HEAD")
     ) {
       // Try to fetch from GitHub
-      const githubUrl = `https://raw.githubusercontent.com/maidsafe/autonomi-llm-docs/main${url.pathname}`;
+      const githubUrl = `https://raw.githubusercontent.com/WithAutonomi/autonomi-llm-docs/main${url.pathname}`;
 
       try {
         const ghResponse = await fetch(githubUrl, { method: request.method });
