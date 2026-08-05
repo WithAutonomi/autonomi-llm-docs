@@ -4,7 +4,7 @@
 - **Date:** 2026-08-04
 - **Decision owners:** Jim Collinson
 - **Reviewers:** To be assigned
-- **Supersedes:** ADR-0002 and ADR-0005 (repository-namespace clauses only)
+- **Supersedes:** none
 - **Superseded by:** none
 - **Related:** ADR-0002 (Worker/GitHub serving); ADR-0004 (PDF serving); ADR-0005 (Worker source management); repository-transfer implementation PR
 
