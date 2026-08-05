@@ -19,6 +19,6 @@
   "devDependencies": {
     "jsonc-parser": "3.3.1",
     "prettier": "3.8.4",
-    "wrangler": "4.104.0"
+    "wrangler": "4.119.0"
   }
 }
