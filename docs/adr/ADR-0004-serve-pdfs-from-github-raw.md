@@ -8,7 +8,7 @@
 - **Superseded by:** none
 - **Related:** ADR-0002 (Worker/GitHub serving); ADR-0003 (`llms.txt`); ADR-0007 (repository transfer)
 
-> **Retrospective ADR.** This record reconstructs a decision made earlier in development, before the ADR process existed in this repo. It is backfilled and proposed on 2026-06-24 (accepted on merge of this PR), on the basis of the decision owner's attestation and direct inspection of the deployed system; it was not produced by contemporaneous review.
+> **Retrospective ADR.** This record reconstructs a decision made earlier in development, before the ADR process existed in this repo. It is backfilled and proposed on 2026-06-24, on the basis of the decision owner's attestation and direct inspection of the deployed system; it was not produced by contemporaneous review.
 
 ## Context
 
