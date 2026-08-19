@@ -26,6 +26,25 @@ async function withFetchMock(handler, pathname, requestInit = undefined) {
   }
 }
 
+async function withConsoleCapture(method, handler) {
+  const originalMethod = console[method];
+  const calls = [];
+  console[method] = (...args) => calls.push(args);
+
+  try {
+    return { calls, result: await handler() };
+  } finally {
+    console[method] = originalMethod;
+  }
+}
+
+function singleJsonEvent(calls) {
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].length, 1);
+  assert.equal(typeof calls[0][0], "string");
+  return JSON.parse(calls[0][0]);
+}
+
 function fallbackResponse(url) {
   return new Response(`fallback:${new URL(url).pathname}`, {
     status: 203,
@@ -260,13 +279,16 @@ test("falls through for over-budget repeated percent encoding", async () => {
 });
 
 test("falls through when GitHub returns a miss", async () => {
-  const { calls, response } = await withFetchMock((url) => {
-    if (url === `${GITHUB_PREFIX}/missing.md`) {
-      return new Response("not found", { status: 404 });
-    }
+  const { calls: warningCalls, result } = await withConsoleCapture("warn", () =>
+    withFetchMock((url) => {
+      if (url === `${GITHUB_PREFIX}/missing.md`) {
+        return new Response("not found", { status: 404 });
+      }
 
-    return fallbackResponse(url);
-  }, "/missing.md");
+      return fallbackResponse(url);
+    }, "/missing.md"),
+  );
+  const { calls, response } = result;
 
   assert.deepEqual(calls, [
     `${GITHUB_PREFIX}/missing.md`,
@@ -274,16 +296,63 @@ test("falls through when GitHub returns a miss", async () => {
   ]);
   assert.equal(response.status, 203);
   assert.equal(await response.text(), "fallback:/missing.md");
+  assert.deepEqual(singleJsonEvent(warningCalls), {
+    event: "github_raw_non_ok",
+    pathname: "/missing.md",
+    status: 404,
+    retry_after: null,
+    rate_limit_remaining: null,
+    github_request_id: null,
+  });
+});
+
+test("falls through unchanged and logs diagnostics when GitHub returns 429", async () => {
+  const pathname = "/rate-limited.md?private=do-not-log";
+  const { calls: warningCalls, result } = await withConsoleCapture("warn", () =>
+    withFetchMock((url) => {
+      if (url === `${GITHUB_PREFIX}/rate-limited.md`) {
+        return new Response("rate limit details must not be logged", {
+          status: 429,
+          headers: {
+            "Retry-After": "120",
+            "X-RateLimit-Remaining": "0",
+            "X-GitHub-Request-Id": "ABC:123",
+          },
+        });
+      }
+
+      return fallbackResponse(url);
+    }, pathname),
+  );
+  const { calls, response } = result;
+
+  assert.deepEqual(calls, [
+    `${GITHUB_PREFIX}/rate-limited.md`,
+    `https://autonomi.com${pathname}`,
+  ]);
+  assert.equal(response.status, 203);
+  assert.equal(await response.text(), "fallback:/rate-limited.md");
+  assert.deepEqual(singleJsonEvent(warningCalls), {
+    event: "github_raw_non_ok",
+    pathname: "/rate-limited.md",
+    status: 429,
+    retry_after: "120",
+    rate_limit_remaining: "0",
+    github_request_id: "ABC:123",
+  });
 });
 
 test("falls through when GitHub fetch throws", async () => {
-  const { calls, response } = await withFetchMock((url) => {
-    if (url === `${GITHUB_PREFIX}/transient.md`) {
-      throw new Error("upstream unavailable");
-    }
+  const { calls: errorCalls, result } = await withConsoleCapture("error", () =>
+    withFetchMock((url) => {
+      if (url === `${GITHUB_PREFIX}/transient.md`) {
+        throw new Error("upstream unavailable");
+      }
 
-    return fallbackResponse(url);
-  }, "/transient.md");
+      return fallbackResponse(url);
+    }, "/transient.md"),
+  );
+  const { calls, response } = result;
 
   assert.deepEqual(calls, [
     `${GITHUB_PREFIX}/transient.md`,
@@ -291,4 +360,10 @@ test("falls through when GitHub fetch throws", async () => {
   ]);
   assert.equal(response.status, 203);
   assert.equal(await response.text(), "fallback:/transient.md");
+  assert.deepEqual(singleJsonEvent(errorCalls), {
+    event: "github_raw_fetch_error",
+    pathname: "/transient.md",
+    error_name: "Error",
+    error_message: "upstream unavailable",
+  });
 });

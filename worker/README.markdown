@@ -25,6 +25,39 @@ npm run check
 
 `npm run check` performs formatting, JavaScript syntax, runtime tests, config assertions, and Wrangler dry-run validation for both preview and production configs. It does not deploy.
 
+## GitHub fallback telemetry
+
+The Worker emits one serialized JSON object before falling through to Framer whenever a GitHub Raw request returns a non-OK response or throws. In Cloudflare, open the logs for the `autonomi-md-proxy` Worker and search for the event name.
+
+- `github_raw_non_ok` is emitted at warning level for every non-OK GitHub response.
+- `github_raw_fetch_error` is emitted at error level when the GitHub fetch throws.
+
+The schemas are:
+
+```json
+{
+  "event": "github_raw_non_ok",
+  "pathname": "/example.md",
+  "status": 429,
+  "retry_after": "120",
+  "rate_limit_remaining": "0",
+  "github_request_id": "ABC:123"
+}
+```
+
+The three diagnostic header fields are strings when GitHub supplies them and `null` when absent.
+
+```json
+{
+  "event": "github_raw_fetch_error",
+  "pathname": "/example.md",
+  "error_name": "TypeError",
+  "error_message": "fetch failed"
+}
+```
+
+Telemetry records the request pathname only. It never includes query values, response bodies, request headers, secrets, or error stacks. Emitting telemetry does not change fallback behaviour: non-OK responses and fetch exceptions still fall through to Framer unchanged.
+
 ## Serving policy
 
 The public serving policy follows ADR-0006:
