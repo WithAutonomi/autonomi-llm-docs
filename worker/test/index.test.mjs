@@ -62,10 +62,17 @@ function encodeRepeatedly(value, times) {
 }
 
 test("proxies public markdown paths from GitHub", async () => {
-  const { calls, response } = await withFetchMock((url) => {
-    assert.equal(url, `${GITHUB_PREFIX}/overview.md`);
-    return new Response("overview", { status: 200 });
-  }, "/overview.md");
+  const { calls: warningCalls, result: errorCapture } =
+    await withConsoleCapture("warn", () =>
+      withConsoleCapture("error", () =>
+        withFetchMock((url) => {
+          assert.equal(url, `${GITHUB_PREFIX}/overview.md`);
+          return new Response("overview", { status: 200 });
+        }, "/overview.md"),
+      ),
+    );
+  const { calls: errorCalls, result } = errorCapture;
+  const { calls, response } = result;
 
   assert.deepEqual(calls, [`${GITHUB_PREFIX}/overview.md`]);
   assert.equal(response.status, 200);
@@ -75,6 +82,8 @@ test("proxies public markdown paths from GitHub", async () => {
     "text/markdown; charset=utf-8",
   );
   assert.equal(response.headers.get("Cache-Control"), "public, max-age=300");
+  assert.deepEqual(warningCalls, []);
+  assert.deepEqual(errorCalls, []);
 });
 
 test("proxies llms.txt as plain text", async () => {

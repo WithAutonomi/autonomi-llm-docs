@@ -29,8 +29,12 @@ npm run check
 
 The Worker emits one serialized JSON object before falling through to Framer whenever a GitHub Raw request returns a non-OK response or throws. In Cloudflare, open the logs for the `autonomi-md-proxy` Worker and search for the event name.
 
+These events appear in production only after the changed Worker SHA is deployed through the manual **Deploy Worker Production** workflow; merging alone does not deploy Worker code.
+
 - `github_raw_non_ok` is emitted at warning level for every non-OK GitHub response.
 - `github_raw_fetch_error` is emitted at error level when the GitHub fetch throws.
+
+Routine missing `.md` probes also emit `github_raw_non_ok`. Group or filter events by `status` so expected 404 noise does not obscure 429 or 5xx evidence.
 
 The schemas are:
 
