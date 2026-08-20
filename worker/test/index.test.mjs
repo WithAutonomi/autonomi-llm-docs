@@ -26,37 +26,43 @@ async function withFetchMock(handler, pathname, requestInit = undefined) {
   }
 }
 
-async function withConsoleCapture(
-  method,
-  handler,
-  implementation = () => undefined,
-) {
-  const originalMethod = console[method];
-  const calls = [];
-  console[method] = (...args) => {
-    calls.push(args);
-    return implementation(...args);
-  };
-
-  try {
-    return { calls, result: await handler() };
-  } finally {
-    console[method] = originalMethod;
+function restoreProperty(object, name, descriptor) {
+  if (descriptor === undefined) {
+    Reflect.deleteProperty(object, name);
+    return;
   }
+
+  Object.defineProperty(object, name, descriptor);
 }
 
 async function withTelemetryCapture(handler, implementations = {}) {
-  const warningCapture = await withConsoleCapture(
-    "warn",
-    () => withConsoleCapture("error", handler, implementations.error),
-    implementations.warn,
-  );
+  const originalWarn = Object.getOwnPropertyDescriptor(console, "warn");
+  const originalError = Object.getOwnPropertyDescriptor(console, "error");
+  const warningCalls = [];
+  const errorCalls = [];
 
-  return {
-    warningCalls: warningCapture.calls,
-    errorCalls: warningCapture.result.calls,
-    result: warningCapture.result.result,
-  };
+  try {
+    Object.defineProperty(console, "warn", {
+      configurable: true,
+      value: (...args) => {
+        warningCalls.push(args);
+        return implementations.warn?.(...args);
+      },
+    });
+    Object.defineProperty(console, "error", {
+      configurable: true,
+      value: (...args) => {
+        errorCalls.push(args);
+        return implementations.error?.(...args);
+      },
+    });
+
+    const result = await handler();
+    return { warningCalls, errorCalls, result };
+  } finally {
+    restoreProperty(console, "warn", originalWarn);
+    restoreProperty(console, "error", originalError);
+  }
 }
 
 function singleObjectEvent(calls) {
@@ -475,6 +481,84 @@ test("falls through without misclassification when warning telemetry throws", as
     rate_limit_remaining: null,
     github_request_id: null,
   });
+});
+
+test("falls through when the console.warn property lookup throws", async () => {
+  const originalWarn = Object.getOwnPropertyDescriptor(console, "warn");
+  const originalError = Object.getOwnPropertyDescriptor(console, "error");
+  const errorCalls = [];
+  let warningLookups = 0;
+  let result;
+
+  try {
+    Object.defineProperty(console, "warn", {
+      configurable: true,
+      get() {
+        warningLookups += 1;
+        throw new Error("warning lookup unavailable");
+      },
+    });
+    Object.defineProperty(console, "error", {
+      configurable: true,
+      value: (...args) => errorCalls.push(args),
+    });
+
+    result = await withFetchMock((url) => {
+      if (url === `${GITHUB_PREFIX}/warning-lookup-failure.md`) {
+        return new Response("not found", { status: 404 });
+      }
+
+      return fallbackResponse(url);
+    }, "/warning-lookup-failure.md");
+  } finally {
+    restoreProperty(console, "warn", originalWarn);
+    restoreProperty(console, "error", originalError);
+  }
+
+  const { calls, response } = result;
+  assert.deepEqual(calls, [
+    `${GITHUB_PREFIX}/warning-lookup-failure.md`,
+    "https://autonomi.com/warning-lookup-failure.md",
+  ]);
+  assert.equal(response.status, 203);
+  assert.equal(await response.text(), "fallback:/warning-lookup-failure.md");
+  assert.equal(warningLookups, 1);
+  assert.deepEqual(errorCalls, []);
+});
+
+test("falls through when the telemetry status lookup throws", async () => {
+  let statusReads = 0;
+  const { warningCalls, errorCalls, result } = await withTelemetryCapture(() =>
+    withFetchMock((url) => {
+      if (url === `${GITHUB_PREFIX}/status-lookup-failure.md`) {
+        return {
+          ok: false,
+          get status() {
+            statusReads += 1;
+            throw new Error("status unavailable");
+          },
+          headers: {
+            get() {
+              return null;
+            },
+          },
+        };
+      }
+
+      return fallbackResponse(url);
+    }, "/status-lookup-failure.md"),
+  );
+  const { calls, response } = result;
+
+  assert.deepEqual(calls, [
+    `${GITHUB_PREFIX}/status-lookup-failure.md`,
+    "https://autonomi.com/status-lookup-failure.md",
+  ]);
+  assert.equal(response.status, 203);
+  assert.equal(await response.text(), "fallback:/status-lookup-failure.md");
+  assert.equal(statusReads, 1);
+  assert.deepEqual(warningCalls, []);
+  assert.deepEqual(errorCalls, []);
 });
 
 test("falls through when fetch-error telemetry throws", async () => {

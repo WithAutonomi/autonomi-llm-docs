@@ -27,16 +27,14 @@ npm run check
 
 ## GitHub fallback telemetry
 
-The Worker passes one plain object to `console.warn` or `console.error` before falling through to Framer whenever a GitHub Raw request returns a non-OK response or throws. Cloudflare extracts the object's top-level keys as structured log fields; open the logs for the `autonomi-md-proxy` Worker and filter or group by fields such as `event` and `status`.
+For each GitHub Raw non-OK response or thrown fetch error, the Worker makes one best-effort attempt to pass a plain object to `console.warn` or `console.error` before falling through to Framer. Cloudflare can extract the object's top-level keys as structured log fields; receipt and storage depend on logger availability and Cloudflare sampling and limits. Open the logs for the `autonomi-md-proxy` Worker and filter or group by fields such as `event` and `status`.
 
-These events appear in production only after the changed Worker SHA is deployed through the manual **Deploy Worker Production** workflow; merging alone does not deploy Worker code.
+The production Worker makes these telemetry attempts only after the changed Worker SHA is deployed through the manual **Deploy Worker Production** workflow; merging alone does not deploy Worker code.
 
-- `github_raw_non_ok` is emitted at warning level for every non-OK GitHub response.
-- `github_raw_fetch_error` is emitted at error level when the GitHub fetch throws.
+- `github_raw_non_ok` is attempted at warning level for a non-OK GitHub response.
+- `github_raw_fetch_error` is attempted at error level when the GitHub fetch throws.
 
-Routine missing `.md` probes also emit `github_raw_non_ok`. Group or filter events by `status` so expected 404 noise does not obscure 429 or 5xx evidence.
-
-With the current 100% log sampling, 404 event volume is request-proportional: every routine missing `.md` probe can produce an event. This is an interim trade-off; revisit the log level or sampling if observed volume or cost obscures the incident signal.
+Routine missing `.md` probes trigger the same best-effort `github_raw_non_ok` attempt. With the current configured 100% sampling, attempted 404 volume is request-proportional. Operators should group or filter by `status` and revisit the log level or sampling if routine 404s dominate the incident signal or log allowance or cost becomes material.
 
 The object schemas are:
 
@@ -62,7 +60,7 @@ The three diagnostic header fields are strings when GitHub supplies them and `nu
 }
 ```
 
-Telemetry records the request pathname only. It never includes query values, response bodies, request headers, secrets, or error stacks. Emitting telemetry does not change fallback behaviour: non-OK responses and fetch exceptions still fall through to Framer unchanged.
+Telemetry construction reads and copies only the allowlisted fields shown above. The code does not read or copy query values, request or response bodies, incoming request headers, bindings or secrets, or stacks into telemetry. Permitted pathname, diagnostic, and error name/message strings are not content-redacted. Telemetry attempts do not change fallback behaviour: non-OK responses and fetch exceptions still fall through to Framer unchanged.
 
 ## Serving policy
 
