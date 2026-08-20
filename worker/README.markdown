@@ -25,6 +25,43 @@ npm run check
 
 `npm run check` performs formatting, JavaScript syntax, runtime tests, config assertions, and Wrangler dry-run validation for both preview and production configs. It does not deploy.
 
+## GitHub fallback telemetry
+
+For each GitHub Raw non-OK response or thrown fetch error, the Worker makes one best-effort attempt to pass a plain object to `console.warn` or `console.error` before falling through to Framer. Cloudflare can extract the object's top-level keys as structured log fields; receipt and storage depend on logger availability and Cloudflare sampling and limits. Open the logs for the `autonomi-md-proxy` Worker and filter or group by fields such as `event` and `status`.
+
+The production Worker makes these telemetry attempts only after the changed Worker SHA is deployed through the manual **Deploy Worker Production** workflow; merging alone does not deploy Worker code.
+
+- `github_raw_non_ok` is attempted at warning level for a non-OK GitHub response.
+- `github_raw_fetch_error` is attempted at error level when the GitHub fetch throws.
+
+Routine missing `.md` probes trigger the same best-effort `github_raw_non_ok` attempt. With the current configured 100% sampling, attempted 404 volume is request-proportional. Operators should group or filter by `status` and revisit the log level or sampling if routine 404s dominate the incident signal or log allowance or cost becomes material.
+
+The object schemas are:
+
+```json
+{
+  "event": "github_raw_non_ok",
+  "pathname": "/example.md",
+  "status": 429,
+  "retry_after": "120",
+  "rate_limit_remaining": "0",
+  "github_request_id": "ABC:123"
+}
+```
+
+The three diagnostic header fields are strings when GitHub supplies them and `null` when absent.
+
+```json
+{
+  "event": "github_raw_fetch_error",
+  "pathname": "/example.md",
+  "error_name": "TypeError",
+  "error_message": "fetch failed"
+}
+```
+
+Telemetry construction reads and copies only the allowlisted fields shown above. The code does not read or copy query values, request or response bodies, incoming request headers, bindings or secrets, or stacks into telemetry. Permitted pathname, diagnostic, and error name/message strings are not content-redacted. Telemetry attempts do not change fallback behaviour: non-OK responses and fetch exceptions still fall through to Framer unchanged.
+
 ## Serving policy
 
 The public serving policy follows ADR-0006:

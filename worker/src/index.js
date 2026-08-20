@@ -80,6 +80,56 @@ function contentTypeFor(pathname) {
     : "text/plain; charset=utf-8";
 }
 
+function githubHeader(response, name) {
+  try {
+    const value = response.headers.get(name);
+    return typeof value === "string" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function errorField(error, name, fallback) {
+  try {
+    const value = error?.[name];
+    return typeof value === "string" ? value : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function emitBestEffort(writeEvent) {
+  try {
+    writeEvent();
+  } catch {
+    // Telemetry must never affect response handling.
+  }
+}
+
+function logGithubNonOk(pathname, response) {
+  emitBestEffort(() => {
+    console.warn({
+      event: "github_raw_non_ok",
+      pathname,
+      status: response.status,
+      retry_after: githubHeader(response, "Retry-After"),
+      rate_limit_remaining: githubHeader(response, "X-RateLimit-Remaining"),
+      github_request_id: githubHeader(response, "X-GitHub-Request-Id"),
+    });
+  });
+}
+
+function logGithubFetchError(pathname, error) {
+  emitBestEffort(() => {
+    console.error({
+      event: "github_raw_fetch_error",
+      pathname,
+      error_name: errorField(error, "name", "Error"),
+      error_message: errorField(error, "message", "Unknown fetch error"),
+    });
+  });
+}
+
 export default {
   async fetch(request) {
     const url = new URL(request.url);
@@ -107,7 +157,10 @@ export default {
             },
           });
         }
-      } catch {
+
+        logGithubNonOk(url.pathname, ghResponse);
+      } catch (error) {
+        logGithubFetchError(url.pathname, error);
         // If GitHub is unreachable, pass through to Framer (graceful fallback)
       }
 
