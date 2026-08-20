@@ -27,7 +27,7 @@ npm run check
 
 ## GitHub fallback telemetry
 
-The Worker emits one serialized JSON object before falling through to Framer whenever a GitHub Raw request returns a non-OK response or throws. In Cloudflare, open the logs for the `autonomi-md-proxy` Worker and search for the event name.
+The Worker passes one plain object to `console.warn` or `console.error` before falling through to Framer whenever a GitHub Raw request returns a non-OK response or throws. Cloudflare extracts the object's top-level keys as structured log fields; open the logs for the `autonomi-md-proxy` Worker and filter or group by fields such as `event` and `status`.
 
 These events appear in production only after the changed Worker SHA is deployed through the manual **Deploy Worker Production** workflow; merging alone does not deploy Worker code.
 
@@ -36,7 +36,9 @@ These events appear in production only after the changed Worker SHA is deployed 
 
 Routine missing `.md` probes also emit `github_raw_non_ok`. Group or filter events by `status` so expected 404 noise does not obscure 429 or 5xx evidence.
 
-The schemas are:
+With the current 100% log sampling, 404 event volume is request-proportional: every routine missing `.md` probe can produce an event. This is an interim trade-off; revisit the log level or sampling if observed volume or cost obscures the incident signal.
+
+The object schemas are:
 
 ```json
 {

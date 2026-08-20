@@ -26,10 +26,17 @@ async function withFetchMock(handler, pathname, requestInit = undefined) {
   }
 }
 
-async function withConsoleCapture(method, handler) {
+async function withConsoleCapture(
+  method,
+  handler,
+  implementation = () => undefined,
+) {
   const originalMethod = console[method];
   const calls = [];
-  console[method] = (...args) => calls.push(args);
+  console[method] = (...args) => {
+    calls.push(args);
+    return implementation(...args);
+  };
 
   try {
     return { calls, result: await handler() };
@@ -38,11 +45,29 @@ async function withConsoleCapture(method, handler) {
   }
 }
 
-function singleJsonEvent(calls) {
+async function withTelemetryCapture(handler, implementations = {}) {
+  const warningCapture = await withConsoleCapture(
+    "warn",
+    () => withConsoleCapture("error", handler, implementations.error),
+    implementations.warn,
+  );
+
+  return {
+    warningCalls: warningCapture.calls,
+    errorCalls: warningCapture.result.calls,
+    result: warningCapture.result.result,
+  };
+}
+
+function singleObjectEvent(calls) {
   assert.equal(calls.length, 1);
   assert.equal(calls[0].length, 1);
-  assert.equal(typeof calls[0][0], "string");
-  return JSON.parse(calls[0][0]);
+
+  const event = calls[0][0];
+  assert.equal(typeof event, "object");
+  assert.notEqual(event, null);
+  assert.equal(Object.getPrototypeOf(event), Object.prototype);
+  return event;
 }
 
 function fallbackResponse(url) {
@@ -62,16 +87,12 @@ function encodeRepeatedly(value, times) {
 }
 
 test("proxies public markdown paths from GitHub", async () => {
-  const { calls: warningCalls, result: errorCapture } =
-    await withConsoleCapture("warn", () =>
-      withConsoleCapture("error", () =>
-        withFetchMock((url) => {
-          assert.equal(url, `${GITHUB_PREFIX}/overview.md`);
-          return new Response("overview", { status: 200 });
-        }, "/overview.md"),
-      ),
-    );
-  const { calls: errorCalls, result } = errorCapture;
+  const { warningCalls, errorCalls, result } = await withTelemetryCapture(() =>
+    withFetchMock((url) => {
+      assert.equal(url, `${GITHUB_PREFIX}/overview.md`);
+      return new Response("overview", { status: 200 });
+    }, "/overview.md"),
+  );
   const { calls, response } = result;
 
   assert.deepEqual(calls, [`${GITHUB_PREFIX}/overview.md`]);
@@ -288,7 +309,7 @@ test("falls through for over-budget repeated percent encoding", async () => {
 });
 
 test("falls through when GitHub returns a miss", async () => {
-  const { calls: warningCalls, result } = await withConsoleCapture("warn", () =>
+  const { warningCalls, errorCalls, result } = await withTelemetryCapture(() =>
     withFetchMock((url) => {
       if (url === `${GITHUB_PREFIX}/missing.md`) {
         return new Response("not found", { status: 404 });
@@ -305,7 +326,8 @@ test("falls through when GitHub returns a miss", async () => {
   ]);
   assert.equal(response.status, 203);
   assert.equal(await response.text(), "fallback:/missing.md");
-  assert.deepEqual(singleJsonEvent(warningCalls), {
+  assert.deepEqual(errorCalls, []);
+  assert.deepEqual(singleObjectEvent(warningCalls), {
     event: "github_raw_non_ok",
     pathname: "/missing.md",
     status: 404,
@@ -317,7 +339,7 @@ test("falls through when GitHub returns a miss", async () => {
 
 test("falls through unchanged and logs diagnostics when GitHub returns 429", async () => {
   const pathname = "/rate-limited.md?private=do-not-log";
-  const { calls: warningCalls, result } = await withConsoleCapture("warn", () =>
+  const { warningCalls, errorCalls, result } = await withTelemetryCapture(() =>
     withFetchMock((url) => {
       if (url === `${GITHUB_PREFIX}/rate-limited.md`) {
         return new Response("rate limit details must not be logged", {
@@ -341,7 +363,8 @@ test("falls through unchanged and logs diagnostics when GitHub returns 429", asy
   ]);
   assert.equal(response.status, 203);
   assert.equal(await response.text(), "fallback:/rate-limited.md");
-  assert.deepEqual(singleJsonEvent(warningCalls), {
+  assert.deepEqual(errorCalls, []);
+  assert.deepEqual(singleObjectEvent(warningCalls), {
     event: "github_raw_non_ok",
     pathname: "/rate-limited.md",
     status: 429,
@@ -352,7 +375,7 @@ test("falls through unchanged and logs diagnostics when GitHub returns 429", asy
 });
 
 test("falls through when GitHub fetch throws", async () => {
-  const { calls: errorCalls, result } = await withConsoleCapture("error", () =>
+  const { warningCalls, errorCalls, result } = await withTelemetryCapture(() =>
     withFetchMock((url) => {
       if (url === `${GITHUB_PREFIX}/transient.md`) {
         throw new Error("upstream unavailable");
@@ -369,10 +392,166 @@ test("falls through when GitHub fetch throws", async () => {
   ]);
   assert.equal(response.status, 203);
   assert.equal(await response.text(), "fallback:/transient.md");
-  assert.deepEqual(singleJsonEvent(errorCalls), {
+  assert.deepEqual(warningCalls, []);
+  assert.deepEqual(singleObjectEvent(errorCalls), {
     event: "github_raw_fetch_error",
     pathname: "/transient.md",
     error_name: "Error",
     error_message: "upstream unavailable",
+  });
+});
+
+test("falls through when GitHub diagnostic header reads fail", async () => {
+  const { warningCalls, errorCalls, result } = await withTelemetryCapture(() =>
+    withFetchMock((url) => {
+      if (url === `${GITHUB_PREFIX}/diagnostic-failure.md`) {
+        return {
+          ok: false,
+          status: 503,
+          headers: {
+            get(name) {
+              if (name === "Retry-After") {
+                throw new Error("header unavailable");
+              }
+
+              return name === "X-RateLimit-Remaining" ? "7" : null;
+            },
+          },
+        };
+      }
+
+      return fallbackResponse(url);
+    }, "/diagnostic-failure.md"),
+  );
+  const { calls, response } = result;
+
+  assert.deepEqual(calls, [
+    `${GITHUB_PREFIX}/diagnostic-failure.md`,
+    "https://autonomi.com/diagnostic-failure.md",
+  ]);
+  assert.equal(response.status, 203);
+  assert.equal(await response.text(), "fallback:/diagnostic-failure.md");
+  assert.deepEqual(errorCalls, []);
+  assert.deepEqual(singleObjectEvent(warningCalls), {
+    event: "github_raw_non_ok",
+    pathname: "/diagnostic-failure.md",
+    status: 503,
+    retry_after: null,
+    rate_limit_remaining: "7",
+    github_request_id: null,
+  });
+});
+
+test("falls through without misclassification when warning telemetry throws", async () => {
+  const { warningCalls, errorCalls, result } = await withTelemetryCapture(
+    () =>
+      withFetchMock((url) => {
+        if (url === `${GITHUB_PREFIX}/warning-failure.md`) {
+          return new Response("not found", { status: 404 });
+        }
+
+        return fallbackResponse(url);
+      }, "/warning-failure.md"),
+    {
+      warn() {
+        throw new Error("warning logger unavailable");
+      },
+    },
+  );
+  const { calls, response } = result;
+
+  assert.deepEqual(calls, [
+    `${GITHUB_PREFIX}/warning-failure.md`,
+    "https://autonomi.com/warning-failure.md",
+  ]);
+  assert.equal(response.status, 203);
+  assert.equal(await response.text(), "fallback:/warning-failure.md");
+  assert.deepEqual(errorCalls, []);
+  assert.deepEqual(singleObjectEvent(warningCalls), {
+    event: "github_raw_non_ok",
+    pathname: "/warning-failure.md",
+    status: 404,
+    retry_after: null,
+    rate_limit_remaining: null,
+    github_request_id: null,
+  });
+});
+
+test("falls through when fetch-error telemetry throws", async () => {
+  const { warningCalls, errorCalls, result } = await withTelemetryCapture(
+    () =>
+      withFetchMock((url) => {
+        if (url === `${GITHUB_PREFIX}/error-log-failure.md`) {
+          throw new Error("upstream unavailable");
+        }
+
+        return fallbackResponse(url);
+      }, "/error-log-failure.md"),
+    {
+      error() {
+        throw new Error("error logger unavailable");
+      },
+    },
+  );
+  const { calls, response } = result;
+
+  assert.deepEqual(calls, [
+    `${GITHUB_PREFIX}/error-log-failure.md`,
+    "https://autonomi.com/error-log-failure.md",
+  ]);
+  assert.equal(response.status, 203);
+  assert.equal(await response.text(), "fallback:/error-log-failure.md");
+  assert.deepEqual(warningCalls, []);
+  assert.deepEqual(singleObjectEvent(errorCalls), {
+    event: "github_raw_fetch_error",
+    pathname: "/error-log-failure.md",
+    error_name: "Error",
+    error_message: "upstream unavailable",
+  });
+});
+
+test("falls through without coercing hostile fetch errors", async () => {
+  let accessorReads = 0;
+  let coercions = 0;
+  const hostileError = {
+    get name() {
+      accessorReads += 1;
+      throw new Error("name unavailable");
+    },
+    get message() {
+      accessorReads += 1;
+      throw new Error("message unavailable");
+    },
+    [Symbol.toPrimitive]() {
+      coercions += 1;
+      throw new Error("must not coerce error");
+    },
+  };
+
+  const { warningCalls, errorCalls, result } = await withTelemetryCapture(() =>
+    withFetchMock((url) => {
+      if (url === `${GITHUB_PREFIX}/hostile-error.md`) {
+        throw hostileError;
+      }
+
+      return fallbackResponse(url);
+    }, "/hostile-error.md"),
+  );
+  const { calls, response } = result;
+
+  assert.deepEqual(calls, [
+    `${GITHUB_PREFIX}/hostile-error.md`,
+    "https://autonomi.com/hostile-error.md",
+  ]);
+  assert.equal(response.status, 203);
+  assert.equal(await response.text(), "fallback:/hostile-error.md");
+  assert.equal(accessorReads, 2);
+  assert.equal(coercions, 0);
+  assert.deepEqual(warningCalls, []);
+  assert.deepEqual(singleObjectEvent(errorCalls), {
+    event: "github_raw_fetch_error",
+    pathname: "/hostile-error.md",
+    error_name: "Error",
+    error_message: "Unknown fetch error",
   });
 });
