@@ -17,19 +17,22 @@ Runtime GitHub Raw makes PR-managed documents depend on upstream requests; failu
 - Reliable canonical documentation.
 - PR-and-merge publication.
 - No runtime GitHub dependency.
-- Preserve ADR-0006 and Framer fallthrough.
+- Preserve ADR-0006 and Framer fallthrough for paths without a matching published asset.
 
 ## Considered Options
 
 1. Runtime GitHub — retains the dependency.
 2. KV/R2 — adds synchronisation state.
-3. Cloudflare Static Assets — chosen.
+3. Cloudflare Static Assets, Worker-first — makes user Worker execution part of every matching asset request, adding cost, limits, availability dependencies, and routing complexity without needed behaviour.
+4. Cloudflare Static Assets, asset-first — chosen.
 
 ## Decision
 
-The Cloudflare Worker remains on `autonomi.com/*`, with Framer as origin and fallthrough. Intercepted records remain Cloudflare-proxied.
+The Cloudflare Worker remains on `autonomi.com/*`, with Framer as origin and fallthrough for requests without a matching published asset. Intercepted records remain Cloudflare-proxied.
 
-Static Assets contain regular Git blobs admitted by ADR-0006, plus `/llms.txt` and `/llms-full.txt`; non-regular modes are excluded. ADR-0006 remains authoritative except for its GitHub-fetch/error wording. Other paths fall through. Markdown uses `text/markdown; charset=utf-8`; indexes use `text/plain; charset=utf-8`; both retain `Cache-Control: public, max-age=300`. Only `GET` and `HEAD` use Static Assets; other methods fall through unchanged to Framer.
+Cloudflare Static Assets use the default asset-first routing. For a request whose path matches a published asset, `GET` and `HEAD` serve the asset. Other methods that Cloudflare routes to Static Assets return `405 Method Not Allowed`. These matching asset requests do not invoke the user Worker or reach Framer. Requests without a matching published asset continue to the Worker and may fall through to Framer.
+
+Static Assets contain regular Git blobs admitted by ADR-0006, plus `/llms.txt` and `/llms-full.txt`; non-regular modes are excluded. ADR-0006 remains authoritative except for its GitHub-fetch/error wording. Markdown uses `text/markdown; charset=utf-8`; indexes use `text/plain; charset=utf-8`; both retain `Cache-Control: public, max-age=300`.
 
 PDFs remain outside scope: documents use direct `raw.githubusercontent.com` links and apex `.pdf` requests fall through. ADR-0004 remains Proposed.
 
@@ -50,6 +53,7 @@ Operators quiesce automatic runs before manual rollback or redeploy. Publication
 
 - Content mistakes can reach production; candidate-controlled machinery can weaken checks.
 - Rollback is not atomic, and drift can delay publication.
+- Asset-first routing deliberately returns `405 Method Not Allowed` for methods other than `GET` and `HEAD` that Cloudflare routes to Static Assets, including `OPTIONS`, rather than allowing those requests to reach the Worker or Framer.
 
 ### Neutral / Operational
 
@@ -58,7 +62,8 @@ Operators quiesce automatic runs before manual rollback or redeploy. Publication
 ## Validation
 
 - The inventory handles add, update, delete, and rename, excluding unsafe Git modes; removed paths stop serving asset bytes after cache expiry.
-- Headers, methods, DNS, fallthrough, PDFs, and runtime GitHub absence match this decision.
+- Headers, DNS, non-asset fallthrough, PDFs, and runtime GitHub absence match this decision.
+- Integrated Static Assets tests verify that matching published assets serve `GET` and `HEAD`; `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS` return `405 Method Not Allowed`; and none of these matching-asset requests invokes the user Worker.
 - Classification and baseline checks auto-publish content-only changes while mixed changes retain ADR-0005 gates.
 - Tests cover current-`main` checks, serialisation, rollback quiescence, and reconciliation without claiming atomic guarantees.
 
