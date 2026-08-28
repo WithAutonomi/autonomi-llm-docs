@@ -1,6 +1,6 @@
 # ADR-0008: Serve public documentation from Cloudflare Static Assets
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-08-24
 - **Decision owners:** Jim Collinson
 - **Reviewers:** Jim Collinson; David Irvine (Hermes-assisted review)
