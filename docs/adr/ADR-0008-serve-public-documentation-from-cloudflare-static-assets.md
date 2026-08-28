@@ -3,7 +3,7 @@
 - **Status:** Proposed
 - **Date:** 2026-08-24
 - **Decision owners:** Jim Collinson
-- **Reviewers:** Jim Collinson
+- **Reviewers:** Jim Collinson; David Irvine (Hermes-assisted review)
 - **Supersedes:** ADR-0002
 - **Superseded by:** none
 - **Related:** ADR-0004 (PDF serving); ADR-0005 (Worker management); ADR-0006 (public serving scope)
@@ -36,7 +36,7 @@ Static Assets contain regular Git blobs admitted by ADR-0006, plus `/llms.txt` a
 
 PDFs remain outside scope: documents use direct `raw.githubusercontent.com` links and apex `.pdf` requests fall through. ADR-0004 remains Proposed.
 
-Content-only changes publish automatically after merge, without dispatch or protected approval. Content-only is selected public content with unchanged machinery. Machinery includes Worker source, Wrangler configuration, asset-selection/build logic, deployment machinery, and workflows. This scoped ADR-0005 refinement leaves mixed changes on its manual dispatch and protected approval.
+This ADR explicitly refines ADR-0005's production-deployment rule: content-only changes publish automatically after merge, without dispatch or protected approval, while mixed changes and serving-machinery changes remain on ADR-0005's manual dispatch and protected approval path. Content-only is selected public content with unchanged machinery. Machinery includes Worker source, Wrangler configuration, asset-selection/build logic, deployment machinery, and workflows.
 
 Automation checks unchanged approved machinery, an active runtime reconciled to the exact manually deployed baseline, and current `main`. The workflow and classifier are candidate-controlled; PR review and ordinary checks are the trust boundary. We add no independent publisher, state service, credential architecture, or atomic interlock. Runs recheck `main` immediately before publication and are serialised where practical; bypass, stale-publication, and rollback races remain accepted.
 
