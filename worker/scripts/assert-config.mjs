@@ -13,6 +13,7 @@ const configPath =
 const configText = fs.readFileSync(configPath, "utf8");
 const parseErrors = [];
 const config = parse(configText, parseErrors, { allowTrailingComma: true });
+const packageConfig = JSON.parse(fs.readFileSync("package.json", "utf8"));
 
 if (parseErrors.length > 0) {
   console.error(`${configPath}: invalid JSONC`);
@@ -27,6 +28,46 @@ function assert(condition, message) {
 }
 
 assert(config.main === "src/index.js", "main must remain src/index.js");
+assert(
+  config.assets !== null && typeof config.assets === "object",
+  "assets must be configured",
+);
+assert(
+  JSON.stringify(Object.keys(config.assets).sort()) ===
+    JSON.stringify(
+      [
+        "directory",
+        "html_handling",
+        "not_found_handling",
+        "run_worker_first",
+      ].sort(),
+    ),
+  "assets must contain only the minimum asset-first configuration",
+);
+assert(
+  config.assets.directory === "./.staged-assets",
+  "assets.directory must be ./.staged-assets",
+);
+assert(
+  config.assets.html_handling === "none",
+  'assets.html_handling must be "none"',
+);
+assert(
+  config.assets.not_found_handling === "none",
+  'assets.not_found_handling must be "none"',
+);
+assert(
+  config.assets.run_worker_first === false,
+  "assets must use native asset-first routing",
+);
+assert(
+  config.assets.binding === undefined,
+  "assets binding must remain absent",
+);
+assert(
+  packageConfig.devDependencies?.wrangler === "4.119.0",
+  "Wrangler must remain pinned to 4.119.0",
+);
 assert(
   config.compatibility_date === "2025-12-09",
   "compatibility_date must remain 2025-12-09",

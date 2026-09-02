@@ -2,6 +2,12 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "autonomi-md-proxy",
   "main": "src/index.js",
+  "assets": {
+    "directory": "./.staged-assets",
+    "html_handling": "none",
+    "not_found_handling": "none",
+    "run_worker_first": false,
+  },
   "compatibility_date": "2025-12-09",
   "workers_dev": false,
   "routes": [
