@@ -13,7 +13,7 @@ This repository contains:
 
 ## How It Works
 
-Eligible content is currently served at `autonomi.com` by the deployed Cloudflare Worker fetching it from GitHub Raw at request time. The Static Assets candidate is not live. After its separately reviewed and protected cutover, Cloudflare will instead serve the exact committed public documentation set without request-time GitHub.
+Before the Static Assets cutover, eligible content is served at `autonomi.com` by the deployed Cloudflare Worker fetching it from GitHub Raw at request time. After the Static Assets cutover, Cloudflare serves the exact committed public documentation set without request-time GitHub. Automatic publication remains a separately attended activation.
 
 Under either serving path, files appear to live on autonomi.com while this GitHub repo remains the source of truth, giving us:
 - Version control for all LLM documentation
