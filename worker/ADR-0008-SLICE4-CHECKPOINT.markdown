@@ -12,7 +12,7 @@ Status: **Draft PR remediation; review reruns pending**
 
 ## Bounded dispositions
 
-- Require attended owner verification that native GitHub rules protect `main` through pull requests and the exact **Worker Check** before automatic-publication variables or credentials are set.
+- Require attended owner verification that native GitHub rules protect `main` through pull requests and require the exact `Check worker` status check produced by the `Worker Check` workflow in GitHub Actions before automatic-publication variables or credentials are set.
 - Make the root README distinguish current GitHub Raw serving, the separately protected Static Assets cutover, and later attended automatic-publication activation.
 - Mark Slice 0 evidence historical, reconcile only stale plan status/authority wording, and record this concise Slice 4 checkpoint.
 - Narrow the runtime test wording to one-fallback behaviour; staging fixture coverage remains the proof of internal-prefix exclusion.
