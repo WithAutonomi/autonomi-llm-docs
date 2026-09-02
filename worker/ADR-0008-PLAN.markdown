@@ -7,20 +7,22 @@ Implement Accepted ADR-0008 with the minimum repository machinery: deterministic
 ## Working rules
 
 - Git is the source of truth. Accepted ADR-0005, ADR-0006, and ADR-0008 are immutable and controlling.
-- Implement one slice at a time. Keep local evidence honest; CI becomes green of record only after separately authorized commit/push/PR work.
+- Implement one slice at a time. Keep local evidence honest; GitHub Actions CI is green of record for each pushed exact head.
 - Do not add dependencies, custom deployment state, a direct Cloudflare API client, credential discovery, exhaustive control-plane parsers, or automated rollback coordination.
 - Stop if a slice needs an unapproved gate, CI, harness, build, environment, credential, setting, architecture, public-interface, or deployment change.
 - Platform and operational unknowns belong at the later attended/live checkpoint, not in speculative local machinery.
 
+The slice entries below preserve their original authorization boundaries. Jim separately authorized the Slice 4 branch, commit, push, and Draft PR actions now recorded in the Slice 4 checkpoint. Merge and all live actions remain unauthorized.
+
 ## Slice 0 — Minimum packet reset
 
-Status: locally authorized and complete when the concise contract, plan, checkpoint, and truthful `planning/STATE.md` pass safe checks.
+Original status: authorized for local completion only. It is now historical and complete.
 
 The earlier detailed candidate remains only in the disposable review packet. Its direct-activation-helper findings are superseded by the owner's standard-Wrangler simplification; they are not silently carried as unresolved requirements.
 
 ## Slice 1 — Deterministic staging
 
-Status: **authorized for local implementation after a lightweight ADR alignment check**. No branch, commit, push, or PR is authorized.
+Original status: **authorized for local implementation after a lightweight ADR alignment check**. That authorization did not include branch, commit, push, or PR actions; those actions were authorized separately at Slice 4.
 
 ### Changes
 
@@ -40,7 +42,7 @@ A dependency, ADR change, new content policy, test-harness/build/environment cha
 
 ## Slice 2 — Static Assets routing
 
-Mechanism checkpoint: obtain approval for the config, Worker, and integrated-test changes before starting.
+Original mechanism checkpoint: approval was required before the config, Worker, and integrated-test changes; it was granted separately before implementation.
 
 ### Changes
 
@@ -56,7 +58,7 @@ Mechanism checkpoint: obtain approval for the config, Worker, and integrated-tes
 
 ## Slice 3 — Baseline guard and standard workflows
 
-Mechanism checkpoint: obtain approval before editing workflows, CI coverage, or the runbook.
+Original mechanism checkpoint: approval was required before editing workflows, CI coverage, or the runbook; it was granted separately before implementation.
 
 ### Changes
 
@@ -73,12 +75,12 @@ Mechanism checkpoint: obtain approval before editing workflows, CI coverage, or 
 
 ## Slice 4 — Branch, PR, CI, and review milestone
 
-Membrane checkpoint: local completion does not authorize any item below.
+Status: branch, commit, push, and Draft PR actions were separately authorized and are in progress. Merge and all live actions remain unauthorized.
 
-1. Obtain owner authorization to create/use the implementation branch and commit the exact reviewed artifacts plus Slices 1–3.
-2. Obtain separate authorization to push and open the PR.
+1. Owner authorization to create/use the implementation branch and commit the exact reviewed artifacts plus Slices 1–3 was granted separately.
+2. Separate authorization to push and open the Draft PR was granted.
 3. Require clean GitHub Actions CI, then exact-head code/spec, ADR-alignment, adversarial, Craft, and behaviour-complete clean-context review. Fix real blockers and rerun affected evidence without reopening settled design.
-4. Obtain separate merge authorization; record the merge SHA and require post-merge CI green.
+4. Separate merge authorization is still required; if granted, record the merge SHA and require post-merge CI green.
 
 No Cloudflare authentication or deployment occurs in this milestone.
 

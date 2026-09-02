@@ -157,8 +157,10 @@ test("all five routed methods on a non-asset fall through once", async () => {
   }
 });
 
-test("excluded, missing, PDF, and control paths are not served as assets", async () => {
-  const nonAssetPaths = [
+test("representative non-asset paths each fall through once", async () => {
+  // Staging tests prove internal-prefix exclusion. These absent internal paths
+  // exercise only the runtime's one-fallback behaviour for non-assets.
+  const representativeNonAssetPaths = [
     "/worker/README.md",
     "/.github/PULL_REQUEST_TEMPLATE.md",
     "/whitepapers/Autonomous-Network.pdf",
@@ -170,7 +172,7 @@ test("excluded, missing, PDF, and control paths are not served as assets", async
     "/_worker.js",
   ];
 
-  for (const pathname of nonAssetPaths) {
+  for (const pathname of representativeNonAssetPaths) {
     resetOriginRequests();
     const response = await harness.fetch(`${originUrl}${pathname}`);
 

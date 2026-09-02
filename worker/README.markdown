@@ -98,6 +98,8 @@ The manual workflow and automatic publication share the non-cancelling `autonomi
 
 `Publish Documentation Assets Production` responds to every push to `main`, without path filters, but its job is inert unless the repository variable `AUTOMATIC_PRODUCTION_PUBLICATION` is exactly `enabled`. Do not create or change that variable, the baseline variable, or automatic credentials until the attended Slice 5 activation.
 
+Mandatory attended activation precondition: before setting automatic-publication variables or credentials, the owner must inspect and verify in GitHub that native repository rules require every change to `main` to arrive through a pull request and require the exact **Worker Check** status check. Record that verification at Slice 5. Do not treat this source tree as enforcement of those GitHub settings.
+
 Before activation, an owner must use the protected manual production workflow, verify the live result, and capture its exact commit from Git and the Cloudflare version message. Set the native repository variable `PRODUCTION_BASELINE_SHA` to that full lowercase commit identity only as part of the separately authorized activation. This variable is the guard input, not a substitute audit record; Git and Cloudflare deployment history remain the records.
 
 For an enabled run, the workflow:

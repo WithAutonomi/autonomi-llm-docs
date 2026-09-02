@@ -13,9 +13,9 @@ This repository contains:
 
 ## How It Works
 
-Content in this repo is served at `autonomi.com` via Cloudflare Worker.
+Eligible content is currently served at `autonomi.com` by the deployed Cloudflare Worker fetching it from GitHub Raw at request time. The Static Assets candidate is not live. After its separately reviewed and protected cutover, Cloudflare will instead serve the exact committed public documentation set without request-time GitHub.
 
-Files appear to live on autonomi.com but are actually served from this GitHub repo, giving us:
+Under either serving path, files appear to live on autonomi.com while this GitHub repo remains the source of truth, giving us:
 - Version control for all LLM documentation
 - Easy collaborative editing
 - Single source of truth
@@ -31,12 +31,12 @@ Public by default:
 - `/llms.txt`
 - `/llms-full.txt`
 
-Internal prefixes not served from GitHub raw content:
+Internal prefixes not served as public documentation:
 
 - `/worker/`
 - `/.github/`
 
-To publish machine-readable content, add a `.md` file outside the internal prefixes. To keep operational or repository-internal documentation out of canonical `autonomi.com` serving, place it under an internal prefix or use a non-served extension. See ADR-0006 for the decision record.
+To make machine-readable content eligible for publication, add a `.md` file outside the internal prefixes. To keep operational or repository-internal documentation out of canonical `autonomi.com` serving, place it under an internal prefix or use a non-served extension. See ADR-0006 for the decision record.
 
 ## Publishing and Managing Content
 
@@ -62,9 +62,9 @@ For a normal content update:
 4. Open a PR.
 5. Review the Markdown and the final `autonomi.com` URL it will map to.
 6. Merge the PR to `main`.
-7. Check the live URL after merge if needed.
+7. Follow the transition state below and check the live URL after the applicable publication or deployment.
 
-After a content PR is merged to `main`, the Cloudflare Worker serves the updated content automatically from GitHub raw content. There is usually no separate deployment step for content-only changes. Served documentation responses use `Cache-Control: public, max-age=300`, so changes may take up to about five minutes to appear at `autonomi.com`.
+Before the Static Assets cutover, the currently deployed Worker continues to serve eligible content from GitHub Raw. Merging the Static Assets candidate alone does not cut over or publish its staged asset set. After the protected cutover and before separately attended activation of automatic publication, merge alone does not publish a new Static Assets set. Once automatic publication is activated, each eligible safe update to `main` publishes the complete exact committed public set. Served documentation responses use `Cache-Control: public, max-age=300`, so published changes may take up to about five minutes to appear at `autonomi.com`.
 
 When public content is added, removed, renamed, or substantially changed:
 
@@ -112,7 +112,7 @@ Under the current policy, any `.md` file outside internal prefixes can be served
 
 Operational or maintenance material that should not be published as canonical Autonomi documentation should live under an internal prefix, or use a non-served extension such as `.markdown`.
 
-Internal prefixes not served from GitHub raw content:
+Internal prefixes not served as public documentation:
 
 - `/worker/`
 - `/.github/`
@@ -126,7 +126,7 @@ Use internal locations for:
 
 Changing content is different from changing serving behaviour.
 
-Content-only changes normally need only a PR merge. Worker or serving-policy changes need additional review and, after merge, a manual Worker deployment. For Worker changes, follow the `worker/README.markdown` runbook: deploy preview, approve the required environment review, smoke test the workers.dev URL, deploy production, approve the required environment review, and smoke test `autonomi.com`. Treat these as serving changes:
+The Static Assets transition rules above apply to content-only changes. After separately attended activation, eligible safe updates to `main` automatically publish the complete public set. Worker or serving-policy changes need additional review and, after merge, a manual Worker deployment. For Worker changes, follow the `worker/README.markdown` runbook: deploy preview, approve the required environment review, smoke test the workers.dev URL, deploy production, approve the required environment review, and smoke test `autonomi.com`. Treat these as serving changes:
 
 - editing `worker/src/index.js`
 - changing Wrangler config

@@ -1,7 +1,9 @@
 # ADR-0008 Slice 0 checkpoint
 
 Date: 2026-09-01
-Status: **Minimum-packet reset complete locally; no CI or commit**
+Status: **Historical — superseded for current execution state by the Slice 4 checkpoint**
+
+This file preserves the Slice 0 reset evidence below. It is not the current branch, CI, review, or authorization state.
 
 ## Owner reset
 
