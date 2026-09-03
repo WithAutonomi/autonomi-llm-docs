@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -32,7 +34,11 @@ jobs:
         working-directory: worker
         run: npm ci
 
-      - name: Check worker
+      - name: Stage exact selected public set
+        working-directory: worker
+        run: npm run stage:assets -- "$GITHUB_SHA"
+
+      - name: Check worker and complete public set
         working-directory: worker
         run: npm run check
 
@@ -41,4 +47,6 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npm run deploy:preview
+        run: >-
+          npm run deploy:preview --
+          --message "Preview source commit $GITHUB_SHA"

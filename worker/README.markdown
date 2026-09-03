@@ -11,7 +11,7 @@ This directory contains source-controlled Cloudflare Worker code and deployment 
 - `workers_dev`: disabled for production
 - Connected bindings: none
 - Observability: logs enabled with 100% sampling; traces disabled in the confirmed production inventory
-- Source-controlled behaviour: serve public `.md`, `/llms.txt`, and `/llms-full.txt` paths from `WithAutonomi/autonomi-llm-docs` on GitHub, excluding internal prefixes `/worker/` and `/.github/`, and falling back to Framer for misses and all other paths
+- Source-controlled behaviour: serve the staged public `.md`, `/llms.txt`, and `/llms-full.txt` set as Cloudflare Static Assets, excluding internal prefixes `/worker/` and `/.github/`, and fall back to Framer for misses and all other paths
 
 ## Local setup
 
@@ -25,64 +25,30 @@ npm run check
 
 `npm run check` performs formatting, JavaScript syntax, runtime tests, config assertions, and Wrangler dry-run validation for both preview and production configs. It does not deploy.
 
-## GitHub fallback telemetry
-
-For each GitHub Raw non-OK response or thrown fetch error, the Worker makes one best-effort attempt to pass a plain object to `console.warn` or `console.error` before falling through to Framer. Cloudflare can extract the object's top-level keys as structured log fields; receipt and storage depend on logger availability and Cloudflare sampling and limits. Open the logs for the `autonomi-md-proxy` Worker and filter or group by fields such as `event` and `status`.
-
-The production Worker makes these telemetry attempts only after the changed Worker SHA is deployed through the manual **Deploy Worker Production** workflow; merging alone does not deploy Worker code.
-
-- `github_raw_non_ok` is attempted at warning level for a non-OK GitHub response.
-- `github_raw_fetch_error` is attempted at error level when the GitHub fetch throws.
-
-Routine missing `.md` probes trigger the same best-effort `github_raw_non_ok` attempt. With the current configured 100% sampling, attempted 404 volume is request-proportional. Operators should group or filter by `status` and revisit the log level or sampling if routine 404s dominate the incident signal or log allowance or cost becomes material.
-
-The object schemas are:
-
-```json
-{
-  "event": "github_raw_non_ok",
-  "pathname": "/example.md",
-  "status": 429,
-  "retry_after": "120",
-  "rate_limit_remaining": "0",
-  "github_request_id": "ABC:123"
-}
-```
-
-The three diagnostic header fields are strings when GitHub supplies them and `null` when absent.
-
-```json
-{
-  "event": "github_raw_fetch_error",
-  "pathname": "/example.md",
-  "error_name": "TypeError",
-  "error_message": "fetch failed"
-}
-```
-
-Telemetry construction reads and copies only the allowlisted fields shown above. The code does not read or copy query values, request or response bodies, incoming request headers, bindings or secrets, or stacks into telemetry. Permitted pathname, diagnostic, and error name/message strings are not content-redacted. Telemetry attempts do not change fallback behaviour: non-OK responses and fetch exceptions still fall through to Framer unchanged.
-
 ## Serving policy
 
 The public serving policy follows ADR-0006:
 
-- `.md` files outside internal prefixes are served from GitHub raw content.
-- `/llms.txt` and `/llms-full.txt` are served from GitHub raw content.
-- Only GET and HEAD requests are served from GitHub raw content; other HTTP methods fall through unchanged.
-- `/worker/` and `/.github/` are internal prefixes and fall through to Framer rather than being served from GitHub raw content.
+- `.md` files outside internal prefixes are staged from one exact Git commit and served as Static Assets.
+- `/llms.txt` and `/llms-full.txt` are staged and served the same way.
+- `GET` and bodyless `HEAD` requests for matching assets serve exact staged bytes. Other methods routed to a matching asset return `405 Method Not Allowed`.
+- `/worker/` and `/.github/` are internal prefixes and are not staged.
+- Requests without a matching asset invoke the Worker once and fall through unchanged to Framer. There is no runtime GitHub request.
 
 Keep operational documentation under internal prefixes or use a non-served extension. This runbook uses `.markdown` so it cannot be exposed by older deployed Worker versions that predate the `/worker/` exclusion rule.
 
 ## GitHub secrets
 
-Manual deploy workflows require these repository, organization, or `production` environment secrets:
+All deploy steps use these exact secret names:
 
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
 
 The Cloudflare API token should be scoped only as broadly as needed for this Worker, including Workers script edit access and route access for the `autonomi.com` zone.
 
-Because this token can update production Cloudflare resources, both deploy workflows use the GitHub `production` environment approval gate before they can access the token. The workflow files reference that environment, but the environment's required reviewers, admin bypass, and self-review settings are GitHub repository settings outside this source tree. Operators must confirm those settings before the first deploy.
+Because this token can update production Cloudflare resources, the manual preview and production workflows use the GitHub `production` environment approval gate before they can access the token. The workflow files reference that environment, but the environment's required reviewers, admin bypass, and self-review settings are GitHub repository settings outside this source tree. Operators must confirm those settings before the first deploy.
+
+Automatic publication does not use that protected environment because content-only merges are intended to publish without a manual approval. Its credentials must not be made available until the attended activation described below. Secrets are exposed only to each workflow's final deploy step; no committed `.env` is used.
 
 ## Preview deploy
 
@@ -101,14 +67,17 @@ Locally, with Cloudflare credentials exported:
 
 ```sh
 cd worker
+SOURCE_COMMIT="$(git rev-parse HEAD)"
+npm run stage:assets -- "$SOURCE_COMMIT"
+npm run check
 npm run deploy:preview
 ```
 
-This uses `wrangler.preview.jsonc`, deploys Worker name `autonomi-md-proxy-preview`, enables `workers_dev`, and does not attach a production route. The deploy script asserts that the preview config has no `route` or `routes` before deployment.
+The workflow stages the complete public set from the exact selected `main` commit before checks and deployment. It uses `wrangler.preview.jsonc`, deploys Worker name `autonomi-md-proxy-preview`, enables `workers_dev`, and does not attach a production route. Preview has its own non-cancelling concurrency group and is isolated from production writes.
 
 ## Production deploy
 
-Production deploys are manual only and run only from the `main` branch. Merging a PR must not deploy production.
+The protected manual production workflow runs only from the `main` branch. Use it for serving-machinery changes and to establish a reviewed baseline for later content-only automatic publication.
 
 From GitHub Actions:
 
@@ -119,18 +88,29 @@ From GitHub Actions:
 5. Wait for the workflow to complete.
 6. Run the production smoke tests below against the routed `autonomi.com` URLs.
 
-The job uses the GitHub `production` environment, so configure and confirm required reviewers/protection there before use.
+The job uses the GitHub `production` environment, so configure and confirm required reviewers/protection there before use. Use this protected workflow rather than a local production deploy so every repository-driven production write stays in the shared concurrency group.
 
-Locally, with Cloudflare credentials exported:
+The workflow stages the complete public set from the exact selected commit, runs the checks, and uses pinned ordinary `wrangler deploy` with `wrangler.jsonc`. It deploys Worker name `autonomi-md-proxy` to route `autonomi.com/*`. The Cloudflare version message records `Protected manual baseline commit <SHA>` so the reviewed baseline remains visible in native deployment history.
 
-```sh
-cd worker
-npm run deploy:production
-```
+The manual workflow and automatic publication share the non-cancelling `autonomi-worker-production` concurrency group. The deploy script asserts the production Worker name and route before deployment.
 
-This uses `wrangler.jsonc` and deploys Worker name `autonomi-md-proxy` to route `autonomi.com/*`.
+## Automatic content publication
 
-The deploy script asserts the production Worker name and route before deployment.
+`Publish Documentation Assets Production` responds to every push to `main`, without path filters, but its job is inert unless the repository variable `AUTOMATIC_PRODUCTION_PUBLICATION` is exactly `enabled`. Do not create or change that variable, the baseline variable, or automatic credentials until the attended Slice 5 activation.
+
+Mandatory attended activation precondition: before setting automatic-publication variables or credentials, the owner must inspect and verify in GitHub that native repository rules require every change to `main` to arrive through a pull request and require the exact `Check worker` status check produced by the `Worker Check` workflow in GitHub Actions. Record that verification at Slice 5. Do not treat this source tree as enforcement of those GitHub settings.
+
+Before activation, an owner must use the protected manual production workflow, verify the live result, and capture its exact commit from Git and the Cloudflare version message. Set the native repository variable `PRODUCTION_BASELINE_SHA` to that full lowercase commit identity only as part of the separately authorized activation. This variable is the guard input, not a substitute audit record; Git and Cloudflare deployment history remain the records.
+
+For an enabled run, the workflow:
+
+1. checks out and stages the complete public set from the exact push SHA;
+2. runs the normal checks and dry-runs;
+3. refreshes network-current `main` and requires it to equal both checked-out `HEAD` and the push SHA;
+4. requires the baseline to be an exact available ancestor and `worker/**`, `.github/workflows/**`, and `.github/actions/**` to be identical at baseline and current `main`;
+5. restages the exact push SHA, then uses pinned ordinary `wrangler deploy` with the production config.
+
+Missing or invalid activation skips the job. A missing, invalid, stale, non-ancestor, or machinery-drifted baseline fails before the deploy step and before Cloudflare secrets are exposed. Serving-machinery changes must use the protected manual path and a later attended baseline reconciliation.
 
 ## Smoke tests
 
@@ -147,9 +127,9 @@ curl -i "$PREVIEW_URL/missing.md"
 curl -i "$PREVIEW_URL/"
 ```
 
-Preview smoke tests validate GitHub proxy paths and non-GitHub-serving behaviour: public documentation paths should be served from GitHub when present, while internal-prefix paths, missing Markdown/LLM paths, and non-matching paths should not return GitHub raw content. The preview Worker is not attached to the production `autonomi.com/*` route, so its workers.dev URL cannot validate that fallthrough reaches Framer.
+Preview smoke tests validate asset paths and non-asset behaviour: staged public documentation paths should serve exact repository bytes, while internal-prefix paths, missing Markdown/LLM paths, and non-matching paths should not serve an asset. The preview Worker is not attached to the production `autonomi.com/*` route, so its workers.dev URL cannot validate that fallthrough reaches Framer.
 
-After a production deploy or rollback, use the routed `autonomi.com` URLs to validate both GitHub proxy paths and Framer fallthrough:
+After a production deploy or rollback, use the routed `autonomi.com` URLs to validate both Static Assets and Framer fallthrough:
 
 ```sh
 curl -i https://autonomi.com/llms.txt
@@ -162,19 +142,20 @@ curl -i https://autonomi.com/
 
 Expected production/route results:
 
-- `/llms.txt` and `/llms-full.txt` return `Content-Type: text/plain; charset=utf-8` and `Cache-Control: public, max-age=300` when present in GitHub.
-- `.md` paths return `Content-Type: text/markdown; charset=utf-8` and `Cache-Control: public, max-age=300` when present in GitHub.
-- Internal-prefix paths such as `/worker/README.md` fall through to Framer rather than serving GitHub raw content.
+- `/llms.txt` and `/llms-full.txt` return their exact staged bytes with `Content-Type: text/plain; charset=utf-8` and `Cache-Control: public, max-age=300`.
+- `.md` paths return their exact staged bytes with `Content-Type: text/markdown; charset=utf-8` and `Cache-Control: public, max-age=300`.
+- Internal-prefix paths such as `/worker/README.md` fall through to Framer rather than serving a repository asset.
 - Missing markdown/LLM paths and non-matching paths fall through to Framer unchanged.
 
 ## Rollback
 
-Preferred rollback options:
+Manual rollback checklist:
 
-1. Re-run **Deploy Worker Production** from the last known-good commit.
-2. Use the Cloudflare dashboard Worker deployment rollback for `autonomi-md-proxy`.
-
-Run the production smoke tests after rollback.
+1. Disable automatic publication and cancel a visible run if needed.
+2. Visually confirm that no production publication or deployment run is queued or running.
+3. Perform the exact intended Cloudflare deployment rollback for `autonomi-md-proxy`.
+4. Run the production smoke tests and verify the rollback.
+5. Restore Git as the source of truth with a reviewed revert or forward fix, deploy that repository state through the protected production workflow, reconcile `PRODUCTION_BASELINE_SHA`, and re-enable automatic publication only when production is verified and quiet.
 
 ## Manual Cloudflare zone dependency
 

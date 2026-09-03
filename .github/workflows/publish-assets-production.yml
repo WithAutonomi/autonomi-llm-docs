@@ -1,0 +1,71 @@
+name: Publish Documentation Assets Production
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autonomi-worker-production
+  cancel-in-progress: false
+
+jobs:
+  publish-assets:
+    name: Publish complete documentation asset set
+    runs-on: ubuntu-latest
+    if: vars.AUTOMATIC_PRODUCTION_PUBLICATION == 'enabled'
+
+    steps:
+      - name: Checkout exact push
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+
+      - name: Install dependencies
+        working-directory: worker
+        run: npm ci
+
+      - name: Stage exact push assets for checks
+        working-directory: worker
+        run: npm run stage:assets -- "$GITHUB_SHA"
+
+      - name: Check worker and complete public set
+        working-directory: worker
+        run: npm run check
+
+      - name: Refresh network-current main
+        run: >-
+          git fetch --no-tags --force origin
+          +refs/heads/main:refs/remotes/origin/main
+
+      - name: Guard protected production baseline
+        working-directory: worker
+        env:
+          PRODUCTION_BASELINE_SHA: ${{ vars.PRODUCTION_BASELINE_SHA }}
+        run: >-
+          npm run guard:production --
+          "$PRODUCTION_BASELINE_SHA" "$GITHUB_SHA"
+
+      - name: Restage exact push assets after guard
+        working-directory: worker
+        run: npm run stage:assets -- "$GITHUB_SHA"
+
+      - name: Publish complete public set to production
+        working-directory: worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: >-
+          npm run deploy:production --
+          --message "Automatic production source commit $GITHUB_SHA"

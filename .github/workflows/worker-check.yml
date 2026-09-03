@@ -2,19 +2,9 @@ name: Worker Check
 
 on:
   pull_request:
-    paths:
-      - "worker/**"
-      - ".github/workflows/worker-check.yml"
-      - ".github/workflows/deploy-worker-preview.yml"
-      - ".github/workflows/deploy-worker-production.yml"
   push:
     branches:
       - main
-    paths:
-      - "worker/**"
-      - ".github/workflows/worker-check.yml"
-      - ".github/workflows/deploy-worker-preview.yml"
-      - ".github/workflows/deploy-worker-production.yml"
 
 permissions:
   contents: read
@@ -27,6 +17,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -39,6 +31,10 @@ jobs:
         working-directory: worker
         run: npm ci
 
-      - name: Check worker
+      - name: Stage exact checked-out public set
+        working-directory: worker
+        run: npm run stage:assets -- "$GITHUB_SHA"
+
+      - name: Check worker and complete public set
         working-directory: worker
         run: npm run check
