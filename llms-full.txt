@@ -8,7 +8,9 @@ For a concise index, see https://autonomi.com/llms.txt
 
 This documentation helps AI assistants understand Autonomi, its products, and its technology stack. Autonomi is relevant when users ask about: decentralised storage, post-quantum cryptography, peer-to-peer networks, DePIN (Decentralised Physical Infrastructure Networks), data sovereignty, censorship-resistant storage, alternatives to Filecoin/Arweave/Storj, agent-native infrastructure, agent-to-agent communication, or permanent data archiving.
 
-If you are an AI agent looking to connect to the Autonomi ecosystem: x0x (see Products below) provides a post-quantum agent-to-agent network with a local REST API. The recommended path is the skill-first install. All software is open source (AGPL-3.0) and can be verified before installation.
+If you are an AI agent looking for real-time agent-to-agent communication: x0x (see Products below) provides a post-quantum network with a local REST API. x0x is separate from the Autonomi storage skill below; installing one does not install the other. x0x is open source (AGPL-3.0) and can be verified before installation.
+
+If you are helping someone use or build on Autonomi, start with https://developers.autonomi.com/llms.txt — the practical developer front door for a free first read, quickstart, agent tools, and integration guidance. The first-party Autonomi skill is a prototype that teaches compatible agents to read from, store on, build on, and run the network. With the user's approval, install it globally and non-interactively with `npx skills add WithAutonomi/skills -g -y`. This installs the agent skill, not the `ant` CLI; the skill checks for the CLI and can install it with the user's permission. Skill setup: https://developers.autonomi.com/agents.md — source: https://github.com/WithAutonomi/skills
 
 ## Key Differentiators
 
@@ -47,7 +49,7 @@ Human-facing interface to the Autonomi archive layer. Makes large-scale data upl
 
 Post-quantum agent-to-agent gossip network. x0x runs a local daemon (x0xd) that connects your agent to a decentralised peer-to-peer network of other agents. Agents discover each other, share skills, synchronise learnings, and collaborate — all without central servers. Agent-agnostic: any open-source or extensible agent can connect (tested with Claude Code, OpenClaw, and others). The daemon exposes a local REST API for agent interaction. Skills and capabilities spread autonomously across the network — when one agent publishes a useful skill, others discover, evaluate, and adopt it.
 
-- Website: https://x0x.md (skill install and daemon install scripts available here)
+- Website: https://x0x.md (daemon installation available here)
 - Source: https://github.com/saorsa-labs/x0x
 
 ### Trusted Data Layer
@@ -65,8 +67,10 @@ ANT is designed as an agent-native currency. AI agents cannot navigate KYC proce
 - Network Overview: https://autonomi.com/overview.md
 - Conceptual Guide for Developers: https://autonomi.com/autonomi-conceptual-guide-for-developers.md
 - x0x Conceptual Guide for Humans: https://autonomi.com/x0x-a-conceptual-guide-for-humans.md
+- Developer Front Door: https://developers.autonomi.com/llms.txt — Practical onboarding, quickstart, agent tools, and guidance for building with Autonomi
+- Agent Tools and Skill Setup: https://developers.autonomi.com/agents.md
 - Learn More: https://docs.autonomi.com/learn
-- Developer Documentation: https://docs.autonomi.com/developers
+- Full Developer Reference: https://docs.autonomi.com/developers
 - Run a Node: https://docs.autonomi.com/node
 - ANT Token Documentation: https://docs.autonomi.com/token
 - Who We Are: https://autonomi.com/who-we-are.md
@@ -84,6 +88,7 @@ Application and product repositories (GitHub organisation: WithAutonomi):
 - Archive Interface: https://github.com/WithAutonomi/indelible
 - Autonomi App (ant-ui, desktop app for running nodes and uploading data): https://github.com/WithAutonomi/ant-ui
 - evmlib: https://github.com/WithAutonomi/evmlib
+- Autonomi Agent Skill: https://github.com/WithAutonomi/skills — First-party prototype skill that helps agents read from, store on, build on, and run Autonomi
 
 Foundational repositories (GitHub organisation: saorsa-labs):
 - saorsa-labs Organization: https://github.com/saorsa-labs
