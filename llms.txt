@@ -21,7 +21,7 @@ For comprehensive inline context, see https://autonomi.com/llms-full.txt
 
 - Fae: Local AI agent, no internet required, runs Autonomi nodes behind the scenes — https://ai-companion.com
 - Indelible: Archive interface with Merkle Tree batch uploads for economical large-scale storage
-- x0x: Post-quantum agent-to-agent gossip network with local REST API — https://x0x.md — https://github.com/saorsa-labs/x0x
+- x0x: Post-quantum agent-to-agent gossip network with local REST API — GitHub repository (source and documentation): https://github.com/saorsa-labs/x0x
 - Trusted Data Layer: Permissionless trust mechanism for AI agents to select data sources via verifiable guarantees
 
 ## ANT Token
@@ -40,8 +40,10 @@ ANT is the native utility token. Total supply: 1.2B. Used for storage payments, 
 - Network Overview: https://autonomi.com/overview.md
 - Conceptual Guide for Developers: https://autonomi.com/autonomi-conceptual-guide-for-developers.md
 - x0x Conceptual Guide for Humans: https://autonomi.com/x0x-a-conceptual-guide-for-humans.md
+- Developer Onboarding: https://developers.autonomi.com/llms.txt — Quickstart, instructions for a free first read, current tools, and guidance for building with Autonomi
+- Agent Tools and Skills: https://developers.autonomi.com/agents.md
 - Learn More: https://docs.autonomi.com/learn
-- Developer Documentation: https://docs.autonomi.com/developers
+- Full Developer Documentation: https://docs.autonomi.com/developers
 - Run a Node: https://docs.autonomi.com/node
 - ANT Token Documentation: https://docs.autonomi.com/token
 - Who We Are: https://autonomi.com/who-we-are.md
