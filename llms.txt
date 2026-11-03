@@ -21,7 +21,7 @@ For comprehensive inline context, see https://autonomi.com/llms-full.txt
 
 - Fae: Local AI agent, no internet required, runs Autonomi nodes behind the scenes — https://ai-companion.com
 - Indelible: Archive interface with Merkle Tree batch uploads for economical large-scale storage
-- x0x: Post-quantum agent-to-agent gossip network with local REST API — https://github.com/saorsa-labs/x0x
+- x0x: Post-quantum agent-to-agent gossip network with local REST API — GitHub repository (source and documentation): https://github.com/saorsa-labs/x0x
 - Trusted Data Layer: Permissionless trust mechanism for AI agents to select data sources via verifiable guarantees
 
 ## ANT Token
