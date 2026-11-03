@@ -62,7 +62,7 @@ ANT is designed as an agent-native currency. AI agents cannot navigate KYC proce
 - Network Overview: https://autonomi.com/overview.md
 - Conceptual Guide for Developers: https://autonomi.com/autonomi-conceptual-guide-for-developers.md
 - x0x Conceptual Guide for Humans: https://autonomi.com/x0x-a-conceptual-guide-for-humans.md
-- Developer Onboarding: https://developers.autonomi.com/llms.txt — Quickstart, a free first read, current tools, and guidance for building with Autonomi
+- Developer Onboarding: https://developers.autonomi.com/llms.txt — Quickstart, instructions for a free first read, current tools, and guidance for building with Autonomi
 - Agent Tools and Skills: https://developers.autonomi.com/agents.md
 - Learn More: https://docs.autonomi.com/learn
 - Full Developer Documentation: https://docs.autonomi.com/developers
